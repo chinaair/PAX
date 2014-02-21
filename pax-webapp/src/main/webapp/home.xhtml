@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://primefaces.org/ui"
+        template="pageWithMenu.xhtml">
+	<ui:define name="content">
+		<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="#{message.home_header}" /></h1>
+		<h:panelGroup styleClass="entry" layout="block">
+			#{loginBean.message}
+			<h:commandButton action="#{loginBean.moveToCreateCustPage}"
+				value="Move to create customer page" />
+			<h:commandButton action="home"
+				value="Reload" />
+			<h:selectOneMenu value="#{loginBean.localeCode}" onchange="submit()"
+			valueChangeListener="#{loginBean.countryLocaleCodeChanged}">
+   			<f:selectItems value="#{loginBean.countriesInMap}" /> 
+   		</h:selectOneMenu>
+			<p:editor />
+			aaaaa đây là tiếng việt nhé
+			<p:inputText />
+			<h:outputText value="#{message.something}" />
+			<h:inputText></h:inputText>
+			<p:commandButton value="print report" actionListener="#{loginBean.printReport}" ajax="false" />
+		</h:panelGroup>
+	</ui:define>
+</ui:composition>

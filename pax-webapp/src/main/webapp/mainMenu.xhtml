@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://primefaces.org/ui">
+        <h:panelGroup styleClass="sidebar" layout="block">
+			<p:panelMenu style="padding-bottom:1px;width:auto">
+				<p:submenu label="1. Input">
+					<p:menuitem value="a. Ticket/Cash Receipt" icon="ui-icon-arrowthickstop-1-s"/>
+					<p:menuitem disabled="true"/>
+					<p:menuitem value="b. Issue Tax Invoice (Pax)" icon="ui-icon-arrowthickstop-1-s"/>
+					<p:menuitem value="c. Tax Invoice Stock (Pax)" icon="ui-icon-arrowthickstop-1-s"/>
+					<p:menuitem value="d. Account Receivable (Pax)" icon="ui-icon-arrowthickstop-1-s"/>
+					<p:menuitem value="e. Adjustment AR (Pax)" icon="ui-icon-arrowthickstop-1-s"/>
+					<p:menuitem value="f. Pax Import Data (SGN)" icon="ui-icon-arrowthickstop-1-s"/>
+					<p:menuitem disabled="true"/>
+					<p:menuitem value="g. Issue Tax Invoice (Cgo)" icon="ui-icon-arrowthickstop-1-s"/>
+					<p:menuitem value="h. Tax Invoice Stock (Cgo)" icon="ui-icon-arrowthickstop-1-s"/>
+					<p:menuitem value="i. Account Receivable (Cgo)" icon="ui-icon-arrowthickstop-1-s"/>
+					<p:menuitem value="j. Ajustment AR (Cgo)" icon="ui-icon-arrowthickstop-1-s"/>
+					<p:menuitem value="k. Cargo Import Data (SGN/HAN)" icon="ui-icon-arrowthickstop-1-s"/>
+				</p:submenu>
+				<p:submenu label="2. Report">
+					<p:menuitem value="a. Generate PBSR" icon="ui-icon-print"/>
+					<p:menuitem value="b. Counter Summary" icon="ui-icon-print"/>
+					<p:menuitem value="c. Daily Invoice (Credit/Cash)" icon="ui-icon-print"/>
+					<p:menuitem value="d. Final Report (Credit/Cash)" icon="ui-icon-print"/>
+					<p:menuitem value="e. Route Grouping" icon="ui-icon-print"/>
+					<p:menuitem value="f. Tax Invoice List (Pax/Cgo)" icon="ui-icon-print"/>
+					<p:menuitem value="g. Issue Tax Invoice (List-Pax)" icon="ui-icon-print"/>
+					<p:menuitem value="h. CGO A/R Details (SGN/HAN)" icon="ui-icon-print"/>
+					<p:menuitem value="i. PAX A/R Details (SGN)" icon="ui-icon-print"/>
+				</p:submenu>
+				<p:submenu label="3. Dictionary">
+					<p:menuitem value="a. Agent" icon="ui-icon-note"/>
+					<p:menuitem value="b. Exchange Rate" icon="ui-icon-note"/>
+					<p:menuitem value="c. Employee" icon="ui-icon-note"/>
+					<p:menuitem value="d. Company" icon="ui-icon-note"/>
+					<p:menuitem value="e. Tax Invoice Code" icon="ui-icon-note"/>
+				</p:submenu>
+				<p:submenu label="4. System">
+					<p:menuitem value="Password" icon="ui-icon-gear" />
+				</p:submenu>
+			</p:panelMenu>
+        </h:panelGroup>
+</ui:composition>

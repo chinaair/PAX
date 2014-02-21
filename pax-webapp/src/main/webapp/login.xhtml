@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+xmlns:h="http://java.sun.com/jsf/html"
+xmlns:f="http://java.sun.com/jsf/core"
+xmlns:ui="http://java.sun.com/jsf/facelets"
+xmlns:p="http://primefaces.org/ui">
+
+<f:view contentType="text/html">
+<h:head>
+		<f:facet name="first">
+			<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+			<meta content='text/html; charset=UTF-8' http-equiv="Content-Type" />
+			<title>China Airlines PAX</title>
+			<link rel="shortcut icon" type="image/png" href="#{request.contextPath}/images/logo.png" />
+		</f:facet>
+		<link type="text/css" rel="stylesheet" href="#{request.contextPath}/css/default.css" />
+	</h:head>
+
+<h:body>
+	<p:layout fullPage="true">
+		<p:layoutUnit position="center">
+	        <h:form>
+	            <p:panelGrid columns="2">
+				    <f:facet name="header">
+				        Login
+				    </f:facet>
+				  
+				    <h:outputLabel for="username" value="User name: *" />  
+				    <p:inputText id="username" value="#{loginBean.username}" label="user name" />
+				    <h:outputLabel for="password" value="Password: *" />
+				    <p:password id="password" value="#{loginBean.password}" label="password" />
+				    
+				    <f:facet name="footer">
+				        <p:commandButton type="button" value="Login" icon="ui-icon-check" style="margin:0"/>
+				    </f:facet>
+				</p:panelGrid>
+	        </h:form>
+	    </p:layoutUnit>
+	</p:layout>
+</h:body>
+
+</f:view>
+</html>
