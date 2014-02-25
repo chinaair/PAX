@@ -9,7 +9,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.EJB;
-import javax.enterprise.context.SessionScoped;
+import javax.enterprise.context.ConversationScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
@@ -18,7 +18,7 @@ import com.chinaair.entity.Customer;
 import com.chinaair.services.CommonServiceBean;
 import com.chinaair.util.JasperUtil;
 
-@SessionScoped
+@ConversationScoped
 @Named
 public class LoginBean implements Serializable {
 	
@@ -34,7 +34,6 @@ public class LoginBean implements Serializable {
 	
 	private static Map<String,Object> countries;
 	
-	@PostConstruct
 	public void init() {
 		countries = new LinkedHashMap<String,Object>();
 		countries.put("English", Locale.ENGLISH); //label, value

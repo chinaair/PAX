@@ -7,10 +7,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.EJB;
-import javax.enterprise.context.SessionScoped;
+import javax.enterprise.context.ConversationScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
@@ -18,7 +17,7 @@ import javax.inject.Named;
 import com.chinaair.entity.RateInfo;
 import com.chinaair.services.RateServiceBean;
 
-@SessionScoped
+@ConversationScoped
 @Named
 public class RateBean implements Serializable {
 	
@@ -40,7 +39,6 @@ public class RateBean implements Serializable {
 	
 	private RateInfo rateInfo;
 
-	@PostConstruct
 	public void init() {
 		countries = new LinkedHashMap<String,Object>();
 		countries.put("English", Locale.ENGLISH); //label, value

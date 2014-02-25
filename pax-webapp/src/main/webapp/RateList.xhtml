@@ -12,26 +12,27 @@
 		<h:panelGroup styleClass="entry" layout="block" style="width:100%;margin-top:20px;margin-bottom:20px">
 		 	
 			<p:panelGrid columns="2" style="width:100%"> 
+				<f:event type="preRenderView" listener="#{rateBean.init}" />
 				<f:facet name="header">  
 		           Exchange Rate
 		        </f:facet> 
 			    <h:outputLabel for="datetime" value="Datetime: *" style="width:5%" />  
-			  	<p:calendar value="#{RateBean.rateInfo.datetime}" id="popupButtonCal" showOn="button" tyle="width:50%"/>  
+			  	<p:calendar value="#{rateBean.rateInfo.datetime}" id="popupButtonCal" showOn="button" tyle="width:50%"/>  
 			  	
 			    <h:outputLabel for="rate" value="Rate *" style="width:5%"/>  
-			    <p:inputText id="rate" value="#{RateBean.rateInfo.rate}" required="true" label="Rate" style="width:50%"/>  
+			    <p:inputText id="rate" value="#{rateBean.rateInfo.rate}" required="true" label="Rate" style="width:50%"/>  
 			  
 			    <f:facet name="footer">  
-			        <p:commandButton type="button" action="#{RateBean.insert}" value="#{message.rate_b_add}" icon="ui-icon-document" style="margin:0"/>
-			        <p:commandButton type="button" action="#{RateBean.update}" value="#{message.rate_b_update}" icon="ui-icon-arrowrefresh-1-w" style="margin:0"/>
-			        <p:commandButton type="button" action="#{RateBean.delete}" value="#{message.rate_b_del}" icon="ui-icon-close" style="margin:0"/>   
-			        <p:commandButton type="button" action="#{RateBean.find}" value="#{message.rate_b_find}" icon="ui-icon-search" style="margin:0"/>  
+			        <p:commandButton type="button" action="#{rateBean.insert}" value="#{message.rate_b_add}" icon="ui-icon-document" style="margin:0"/>
+			        <p:commandButton type="button" action="#{rateBean.update}" value="#{message.rate_b_update}" icon="ui-icon-arrowrefresh-1-w" style="margin:0"/>
+			        <p:commandButton type="button" action="#{rateBean.delete}" value="#{message.rate_b_del}" icon="ui-icon-close" style="margin:0"/>   
+			        <p:commandButton type="button" action="#{rateBean.find}" value="#{message.rate_b_find}" icon="ui-icon-search" style="margin:0"/>  
 			    </f:facet>  
 			</p:panelGrid>  
 		</h:panelGroup>
 		<h:panelGroup styleClass="entry" layout="block">
-			<p:dataTable id="rateInfos" var="rate" value="#{RateBean.rateInfoList}" rowKey="#{rate.ID}"  
-                 selection="#{RateBean.selectedRateInfo}" selectionMode="single">  
+			<p:dataTable id="rateInfos" var="rate" value="#{rateBean.rateInfoList}" rowKey="#{rate.ID}"  
+                 selection="#{rateBean.selectedRateInfo}" selectionMode="single">  
   
 	        <f:facet name="header">  
 	           Exchange Rate List

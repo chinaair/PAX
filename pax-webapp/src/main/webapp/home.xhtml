@@ -8,6 +8,7 @@
         xmlns:p="http://primefaces.org/ui"
         template="pageWithMenu.xhtml">
 	<ui:define name="content">
+		<f:event type="preRenderView" listener="#{loginBean.init}" />
 		<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="#{message.home_header}" /></h1>
 		<h:panelGroup styleClass="entry" layout="block">
 			#{loginBean.message}
