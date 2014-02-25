@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://primefaces.org/ui"
+        template="pageWithMenu.xhtml">
+	<ui:define name="content">
+		<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="#{message.home_header}" /></h1>
+		<h:panelGroup styleClass="entry" layout="block" style="width:100%;margin-top:20px;margin-bottom:20px">
+		 	
+			<p:panelGrid columns="2" style="width:100%"> 
+				<f:facet name="header">  
+		           Exchange Rate
+		        </f:facet> 
+			    <h:outputLabel for="datetime" value="Datetime: *" style="width:5%" />  
+			  	<p:calendar value="#{RateBean.rateInfo.datetime}" id="popupButtonCal" showOn="button" tyle="width:50%"/>  
+			  	
+			    <h:outputLabel for="rate" value="Rate *" style="width:5%"/>  
+			    <p:inputText id="rate" value="#{RateBean.rateInfo.rate}" required="true" label="Rate" style="width:50%"/>  
+			  
+			    <f:facet name="footer">  
+			        <p:commandButton type="button" action="#{RateBean.insert}" value="#{message.rate_b_add}" icon="ui-icon-document" style="margin:0"/>
+			        <p:commandButton type="button" action="#{RateBean.update}" value="#{message.rate_b_update}" icon="ui-icon-arrowrefresh-1-w" style="margin:0"/>
+			        <p:commandButton type="button" action="#{RateBean.delete}" value="#{message.rate_b_del}" icon="ui-icon-close" style="margin:0"/>   
+			        <p:commandButton type="button" action="#{RateBean.find}" value="#{message.rate_b_find}" icon="ui-icon-search" style="margin:0"/>  
+			    </f:facet>  
+			</p:panelGrid>  
+		</h:panelGroup>
+		<h:panelGroup styleClass="entry" layout="block">
+			<p:dataTable id="rateInfos" var="rate" value="#{RateBean.rateInfoList}" rowKey="#{rate.ID}"  
+                 selection="#{RateBean.selectedRateInfo}" selectionMode="single">  
+  
+	        <f:facet name="header">  
+	           Exchange Rate List
+	        </f:facet>  
+	  
+	        <p:column headerText="Datetime">  
+	           
+	        </p:column>  
+	  
+	        <p:column headerText="Rate">  
+	             
+	        </p:column>  
+	  
+    </p:dataTable>  
+		</h:panelGroup>
+	</ui:define>
+</ui:composition>
