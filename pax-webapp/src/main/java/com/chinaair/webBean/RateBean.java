@@ -130,5 +130,6 @@ public class RateBean implements Serializable {
 
 	public void setRateInfo(RateInfo rateInfo) {
 		this.rateInfo = rateInfo;
+		//comment
 	}
 }
