@@ -51,6 +51,7 @@ public class RateBean implements Serializable {
 	public void loadRateList(){
 		rateInfoList = new ArrayList<RateInfo>();
 		rateInfoList = rateService.getRateList();
+		System.err.println("jofen test load rate");
 	}
 	
 	public String insert(){
@@ -100,6 +101,7 @@ public class RateBean implements Serializable {
 	}
 	
 	public String getLocaleCode() {
+	
 		return localeCode;
 	}
  
@@ -130,6 +132,6 @@ public class RateBean implements Serializable {
 
 	public void setRateInfo(RateInfo rateInfo) {
 		this.rateInfo = rateInfo;
-		//comment
+		
 	}
 }
