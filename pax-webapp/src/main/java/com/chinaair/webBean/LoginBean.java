@@ -38,6 +38,7 @@ public class LoginBean implements Serializable {
 		countries = new LinkedHashMap<String,Object>();
 		countries.put("English", Locale.ENGLISH); //label, value
 		countries.put("Vietnamese", new Locale("vi"));
+		System.err.println("jofenquan test");
 	}
 	
 	@PreDestroy
