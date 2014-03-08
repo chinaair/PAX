@@ -1,6 +1,6 @@
 package com.chinaair.services;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 
 import javax.ejb.LocalBean;
@@ -9,9 +9,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
-
-
-import com.chinaair.entity.RateInfo;
+import com.chinaair.entity.Rate;
 
 @Stateless
 @LocalBean
@@ -21,20 +19,20 @@ public class RateServiceBean {
 	private EntityManager em;
 	
 	@SuppressWarnings("unchecked")
-	public List<RateInfo> getRateList() {
+	public List<Rate> getRateList() {
 		StringBuffer strbuffer = new StringBuffer(); 
 		strbuffer.append("Select rate ")
-		         .append("From RateInfo as rate ")
+		         .append("From Rate as rate ")
 		         .append("Order by rate.datetime desc");
 		Query query = em.createQuery(strbuffer.toString());
 		return query.getResultList();
 	}
 	
-	public RateInfo getRateById(Long id) {
-		RateInfo rate = em.find(RateInfo.class, id);
+	public Rate getRateById(Long id) {
+		Rate rate = em.find(Rate.class, id);
 		return rate;
 	}
-	public RateInfo getRateByDatetime(Date datetime) {
+	public Rate getRateByDatetime(Date datetime) {
 		/*StringBuffer strbuffer = new StringBuffer(); 
 		strbuffer.append("Select rate ")
 		         .append("From RateInfo as rate ")
@@ -45,18 +43,18 @@ public class RateServiceBean {
 		return list.get(0);*/
 		return null;
 	}
-	public void insert(RateInfo rate){
+	public void insert(Rate rate){
 		em.persist(rate);
 		em.flush();
 	}
-	public void update(RateInfo rate){
+	public void update(Rate rate){
 		/*RateInfo curRate = em.find(RateInfo.class,rate.getId());
 		curRate.setDatetime(rate.getDatetime());
 		curRate.setRate(rate.getRate());
 		em.merge(rate);
 		em.flush();*/
 	}
-	public void delete(RateInfo rate){
+	public void delete(Rate rate){
 		em.remove(rate);
 		em.flush();
 	}

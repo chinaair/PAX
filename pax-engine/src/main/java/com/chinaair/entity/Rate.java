@@ -2,24 +2,28 @@ package com.chinaair.entity;
 
 
 
-import java.sql.Date;
+
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 
 @Entity
-public class RateInfo {
+public class Rate {
 	
 	@Id
 	@Column(name="ID", unique = true, nullable = false)
 	private Long id;
 	
-	@Column(name="Date", nullable = false)
+	@Column(name="DATE", nullable = false)
+	@Temporal(TemporalType.DATE)
 	private Date datetime;
 	
-	@Column(name="Rate", nullable = false)
+	@Column(name="RATE", nullable = false)
 	private Double rate;
 	
 	public Long getId() {
