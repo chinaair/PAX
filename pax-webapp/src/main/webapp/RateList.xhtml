@@ -39,8 +39,9 @@
 			</p:panelGrid>  
 		</h:panelGroup>
 		<h:panelGroup styleClass="entry" layout="block">
-			<p:dataTable id="rateInfos" var="rate" value="#{rateBean.rateInfoList}" rowKey="#{rate.ID}"  
-                 selection="#{rateBean.selectedRateInfo}">  
+			<p:dataTable value="#{rateBean.rateInfoList}" var="rate"
+				rowKey="#{rate.id}" selection="#{rateBean.selectedRateInfo}"
+				selectionMode="single">
   
 	        <f:facet name="header">  
 	           Exchange Rate List
