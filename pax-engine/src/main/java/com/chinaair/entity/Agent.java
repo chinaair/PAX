@@ -1,52 +1,78 @@
 package com.chinaair.entity;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class Agent {
+public class Agent implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3604228958713114645L;
+
 	@Id
 	@Column(name="ID", unique = true, nullable = false)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@Column(name="AgentCode", nullable = false)
-	private String agentCode;
+	@Column(name="CODE", unique = true, nullable = false)
+	private String code;
 	
-	@Column(name="AgentName", nullable = false)
-	private String agentName;
+	/**
+	 * 0: Hochiminh
+	 * 1: Hanoi
+	 */
+	@Column(name="LOCATION", nullable = false)
+	private String location;
 	
-	@Column(name="Company", nullable = false)
-	private String company;
-	
-	@Column(name="TaxCode", nullable = false)
-	private String taxCode;
-	
-	@Column(name="Phone", nullable = false)
-	private String phone;
-	
-	@Column(name="Address", nullable = false)
-	private String address;
-	
-	@Column(name="Email", nullable = false)
-	private String email;
-	
-	@Column(name="Type", nullable = false)
+	/**
+	 * 0: passenger
+	 * 1: cargo
+	 */
+	@Column(name="TYPE", nullable = false)
 	private String type;
 	
-	@Column(name="Deposit", nullable = false)
-	private String deposit;
+	@Column(name="NAME", nullable = false)
+	private String name;
 	
-	@Column(name="Amount", nullable = false)
-	private String amount;
+	@Column(name="COMPANY")
+	private String company;
 	
-	@Column(name="ValidDate", nullable = false)
-	private String validDate;
+	@Column(name="VAT_CODE")
+	private String vat_code;
 	
-	@Column(name="Branch", nullable = false)
-	private String branch;
+	@Column(name="PHONE")
+	private String phone;
 	
+	@Column(name="FAX")
+	private String fax;
+	
+	@Column(name="ADDRESS")
+	private String address;
+	
+	@Column(name="EMAIL")
+	private String email;
+	
+	/**
+	 * 0: security deposit
+	 * 1: bank guarantee
+	 */
+	@Column(name="DEPOSIT_TYPE")
+	private String deposit_type;
+	
+	@Column(name="DEPOSIT_AMT")
+	private BigDecimal deposit_amt;
+	
+	@Column(name="VALID_DATE")
+	private Date valid_date;
 
 	public Long getId() {
 		return id;
@@ -56,20 +82,36 @@ public class Agent {
 		this.id = id;
 	}
 
-	public String getAgentCode() {
-		return agentCode;
+	public String getCode() {
+		return code;
 	}
 
-	public void setAgentCode(String agentCode) {
-		this.agentCode = agentCode;
+	public void setCode(String code) {
+		this.code = code;
 	}
 
-	public String getAgentName() {
-		return agentName;
+	public String getLocation() {
+		return location;
 	}
 
-	public void setAgentName(String agentName) {
-		this.agentName = agentName;
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getCompany() {
@@ -80,12 +122,12 @@ public class Agent {
 		this.company = company;
 	}
 
-	public String getTaxCode() {
-		return taxCode;
+	public String getVat_code() {
+		return vat_code;
 	}
 
-	public void setTaxCode(String taxCode) {
-		this.taxCode = taxCode;
+	public void setVat_code(String vat_code) {
+		this.vat_code = vat_code;
 	}
 
 	public String getPhone() {
@@ -94,6 +136,14 @@ public class Agent {
 
 	public void setPhone(String phone) {
 		this.phone = phone;
+	}
+
+	public String getFax() {
+		return fax;
+	}
+
+	public void setFax(String fax) {
+		this.fax = fax;
 	}
 
 	public String getAddress() {
@@ -112,46 +162,29 @@ public class Agent {
 		this.email = email;
 	}
 
-	public String getType() {
-		return type;
+	public String getDeposit_type() {
+		return deposit_type;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setDeposit_type(String deposit_type) {
+		this.deposit_type = deposit_type;
 	}
 
-	public String getDeposit() {
-		return deposit;
+	public BigDecimal getDeposit_amt() {
+		return deposit_amt;
 	}
 
-	public void setDeposit(String deposit) {
-		this.deposit = deposit;
+	public void setDeposit_amt(BigDecimal deposit_amt) {
+		this.deposit_amt = deposit_amt;
 	}
 
-	public String getAmount() {
-		return amount;
+	public Date getValid_date() {
+		return valid_date;
 	}
 
-	public void setAmount(String amount) {
-		this.amount = amount;
+	public void setValid_date(Date valid_date) {
+		this.valid_date = valid_date;
 	}
-
-	public String getValidDate() {
-		return validDate;
-	}
-
-	public void setValidDate(String validDate) {
-		this.validDate = validDate;
-	}
-
-	public String getBranch() {
-		return branch;
-	}
-
-	public void setBranch(String branch) {
-		this.branch = branch;
-	}
-
 
 }
 
