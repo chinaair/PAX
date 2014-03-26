@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui">
+
+<f:view contentType="text/html">
+    <h:head>
+        <title>Agent</title>
+        <link type="text/css" rel="stylesheet" href="#{request.contextPath}/css/default.css" />
+    </h:head>
+
+    <h:body>
+        <h:form>
+        	<f:event type="preRenderView" listener="#{selectAgentBean.init}" />
+            <p:dataTable var="agent" value="#{selectAgentBean.agentList}"rowKey="#{agent.id}" selection="#{selectAgentBean.selectAgentFromDialog}" selectionMode="single">
+            
+                <p:column headerText="#{message.selectAgent_code}">
+                    <h:outputText value="#{agent.code}" />
+                </p:column>
+  
+                <p:column headerText="#{message.selectAgent_name}">
+                    <h:outputText value="#{agent.name}" />
+                </p:column>
+
+                <p:column headerText="#{message.selectAgent_companyName}">
+                    <h:outputText value="#{agent.company}" />
+                </p:column>
+
+                <p:column headerText="#{message.selectAgent_address}">
+                    <h:outputText value="#{agent.address}" />
+                </p:column>
+
+            </p:dataTable>
+        </h:form>
+    </h:body>  
+</f:view>
+</html>

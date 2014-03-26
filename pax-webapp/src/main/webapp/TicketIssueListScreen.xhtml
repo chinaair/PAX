@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:pe="http://primefaces.org/ui/extensions"
+        template="pageWithMenu.xhtml">
+	<ui:define name="content">
+		<f:event type="preRenderView" listener="#{ticketIssueBean.init}" />
+		<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="#{message.ticketIssue_header}" /></h1>
+		<h:panelGroup styleClass="entry" layout="block">
+			<p:panelGrid columns="2">
+				<f:facet name="header">
+					#{message.ticketIssue_input_header}
+				</f:facet>
+				
+				<h:outputLabel for="issueDate" value="Issue Date:" />
+				<p:calendar id="issueDate" value="#{ticketIssueBean.issueDate}" showOn="button" />
+				
+				<h:outputLabel for="roe" value="ROE:" />
+				<pe:inputNumber id="roe" value="#{ticketIssueBean.roe}" label="ROE" />
+				
+				<h:outputLabel for="refNo" value="Ref No.:" />
+				<p:inputText id="refNo" value="#{ticketIssueBean.refNo}" label="Ref No." />
+				
+				<h:outputLabel for="paymentType" value="Payment type:" />
+				<p:selectOneRadio id="paymentType" value="#{ticketIssueBean.paymentType}">
+					<f:selectItem itemLabel="Cash base" itemValue="0" />
+					<f:selectItem itemLabel="Credit card" itemValue="1" />
+					<f:selectItem itemLabel="Bank transfer" itemValue="2" />
+					<f:selectItem itemLabel="Account receivable" itemValue="3" />
+				</p:selectOneRadio>
+				
+				<h:outputLabel for="agent" value="Agent:" />
+				<h:panelGroup>
+					<p:inputText id="agent" value="#{ticketIssueBean.displayAgentName}" label="Agent" />
+					<p:commandButton icon="ui-icon-extlink" actionListener="#{ticketIssueBean.chooseAgent}">
+						<p:ajax event="dialogReturn" listener="#{ticketIssueBean.onAgentChosen}" update="agent" />
+					</p:commandButton>
+					<p:commandButton value="Non-Ajax Submit" actionListener="#{ticketIssueBean.chooseAgent}"   
+            		ajax="false" />
+				</h:panelGroup>
+				
+			</p:panelGrid>
+			
+			<p:dataTable var="detail" value="#{ticketIssueBean.ticketIssueDetails}" rowKey="#{detail.id}"  
+                 selection="#{ticketIssueBean.selectedTicketIssueDetail}" selectionMode="single">
+				<p:column headerText="#{message.ticketIssue_number}">
+		            #{detail.ticketNo}
+		        </p:column>
+		        
+		        <p:column headerText="#{message.ticketIssue_route}">
+		            #{detail.route}
+		        </p:column>
+		        
+		        <p:column headerText="#{message.ticketIssue_quantity}">
+		            #{detail.quantity}
+		        </p:column>
+		        
+		        <p:column headerText="#{message.ticketIssue_price}">
+		            #{detail.price}
+		        </p:column>
+		        
+		        <p:column headerText="#{message.ticketIssue_amount}">
+		            #{detail.amount}
+		        </p:column>
+		        
+		        <p:columnGroup type="footer">
+		        	<p:row>
+		        		<p:column footerText="" />
+		        		<p:column colspan="2" footerText="#{message.ticketIssue_total_amt_usd}#{ticketIssueBean.totalAmtUsd}" />
+		        		<p:column colspan="2" footerText="#{message.ticketIssue_total_amt_vnd}#{ticketIssueBean.totalAmtVnd}" />
+		        	</p:row>
+		        </p:columnGroup>
+		        
+		        <f:facet name="footer">
+		        </f:facet>
+
+			</p:dataTable>
+		</h:panelGroup>
+	</ui:define>
+</ui:composition>
