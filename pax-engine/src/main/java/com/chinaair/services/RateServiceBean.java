@@ -33,15 +33,14 @@ public class RateServiceBean {
 		return rate;
 	}
 	public Rate getRateByDatetime(Date datetime) {
-		/*StringBuffer strbuffer = new StringBuffer(); 
+		StringBuffer strbuffer = new StringBuffer(); 
 		strbuffer.append("Select rate ")
-		         .append("From RateInfo as rate ")
+		         .append("From Rate as rate ")
 		         .append("Where rate.datetime = ?1");
 		Query query = em.createQuery(strbuffer.toString());
 		query.setParameter(1, datetime);
-		List<RateInfo> list = query.getResultList(); 
-		return list.get(0);*/
-		return null;
+		List<Rate> list = query.getResultList(); 
+		return list.get(0);
 	}
 	public void insert(Rate rate){
 		em.persist(rate);

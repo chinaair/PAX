@@ -2,6 +2,7 @@ package com.chinaair.webBean;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -9,15 +10,18 @@ import java.util.Map;
 
 import javax.annotation.PreDestroy;
 import javax.ejb.EJB;
-import javax.enterprise.context.ConversationScoped;
+import javax.enterprise.context.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
 
+import org.primefaces.event.SelectEvent;
+
 import com.chinaair.entity.Rate;
+import com.chinaair.services.CommonUtils;
 import com.chinaair.services.RateServiceBean;
 
-@ConversationScoped
+@SessionScoped
 @Named
 public class RateBean implements Serializable {
 	
@@ -39,6 +43,10 @@ public class RateBean implements Serializable {
 	
 	private Rate rateInfo;
 
+    private Double amount;  
+
+    private Date date;  
+	
 	public void init() {
 		countries = new LinkedHashMap<String,Object>();
 		countries.put("English", Locale.ENGLISH); //label, value
@@ -46,38 +54,64 @@ public class RateBean implements Serializable {
 		rateInfoList = new ArrayList<Rate>();
 		rateInfoList = rateService.getRateList();
 		rateInfo = new Rate();
+		date = null;
+		amount = null;
 		loadRateList();
 	}
 	
 	public void loadRateList(){
 		rateInfoList = new ArrayList<Rate>();
 		rateInfoList = rateService.getRateList();
-		System.err.println("jofen test load rate");
 	}
 	
 	public String insert(){
-		if(rateInfo!=null && rateInfo.getDatetime()!=null && rateInfo.getRate()!=null){
-			rateService.insert(rateInfo);
+		if(date!=null && amount!=null){
+			Rate rate = new Rate(); 
+			rate.setDatetime(date);
+			rate.setRate(amount);
+			rateService.insert(rate);
 			loadRateList();
 		}
-		
+		date = null;
+		amount = null;
 		return  "";
 	}
 	public String update(){
-		rateService.update(rateInfo);
-		loadRateList();
+		if(selectedRateInfo!=null && date!=null && amount!=null){
+			selectedRateInfo.setDatetime(date);
+			selectedRateInfo.setRate(amount);
+			rateService.update(selectedRateInfo);
+			loadRateList();
+		}
+		date = null;
+		amount = null;
 		return  "";
 	}
 	public String delete(){
-		rateService.delete(rateInfo);
-		loadRateList();
+		if(selectedRateInfo!=null){
+			rateService.delete(selectedRateInfo);
+			loadRateList();	
+		}
+		date = null;
+		amount = null;
 		return  "";
 	}
 	public String find(){
-		selectedRateInfo = rateService.getRateByDatetime(rateInfo.getDatetime());
-		rateInfo = new Rate();
-		rateInfo = selectedRateInfo;
+		if(date!=null && amount!=null){
+			Rate rate = rateService.getRateByDatetime(date);
+			date = rate.getDatetime();
+			amount = rate.getRate();
+		}
 		return  "";
+	}
+	public void onRowSelect(SelectEvent event) {  
+		date = rateInfo.getDatetime();
+		amount = rateInfo.getRate();
+		selectedRateInfo = rateInfo;
+    }  
+	private boolean checkError(){
+		boolean error1 = CommonUtils.isThisDateValid(rateInfo.getDatetime().toString(), "dd/mm/yyyy");
+		return error1;
 	}
 	
 	@PreDestroy
@@ -142,5 +176,21 @@ public class RateBean implements Serializable {
 	public void setRateInfo(Rate rateInfo) {
 		this.rateInfo = rateInfo;
 		
+	}
+
+	public Double getAmount() {
+		return amount;
+	}
+
+	public void setAmount(Double amount) {
+		this.amount = amount;
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
 	}
 }
