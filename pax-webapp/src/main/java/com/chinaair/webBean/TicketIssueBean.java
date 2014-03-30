@@ -2,8 +2,11 @@ package com.chinaair.webBean;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Named;
@@ -34,6 +37,8 @@ public class TicketIssueBean implements Serializable {
 	
 	private List<TicketIssueDetail> ticketIssueDetails;
 	
+	private List<TicketIssueDetail> inputTicketDetails;
+	
 	private TicketIssueDetail selectedTicketIssueDetail;
 	
 	private BigDecimal totalAmtUsd;
@@ -44,8 +49,28 @@ public class TicketIssueBean implements Serializable {
 		
 	}
 	
+	public void initDetail() {
+		if(ticketIssueDetails != null && !ticketIssueDetails.isEmpty()) {
+			inputTicketDetails = new ArrayList<>();
+			for(TicketIssueDetail item : ticketIssueDetails) {
+				TicketIssueDetail newItem = new TicketIssueDetail();
+				newItem.setAmount(item.getAmount());
+				newItem.setId(item.getId());
+				newItem.setLastUpdate(item.getLastUpdate());
+				newItem.setPrice(item.getPrice());
+				newItem.setQuantity(item.getQuantity());
+				newItem.setRoute(item.getRoute());
+				newItem.setTicketIssue(item.getTicketIssue());
+				newItem.setTicketNo(item.getTicketNo());
+				inputTicketDetails.add(newItem);
+			}
+		}
+	}
+	
 	public void chooseAgent() {
-		RequestContext.getCurrentInstance().openDialog("selectAgent");
+		Map<String,Object> options = new HashMap<String, Object>();
+        options.put("modal", true);
+		RequestContext.getCurrentInstance().openDialog("selectAgent", options, null);
 	}
 	
 	public void onAgentChosen(SelectEvent event) {

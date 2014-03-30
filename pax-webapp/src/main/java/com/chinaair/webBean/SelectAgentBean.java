@@ -24,12 +24,13 @@ public class SelectAgentBean implements Serializable {
 	
 	private List<Agent> agentList;
 	
+	private Agent selectedAgent;
+	
 	public void init() {
 		agentList = agentService.getAllAgent();
 	}
 	
 	public void selectAgentFromDialog(SelectEvent event) {
-		Agent selectedAgent = (Agent)event.getObject();
 		RequestContext.getCurrentInstance().closeDialog(selectedAgent);
 	}
 
@@ -39,6 +40,14 @@ public class SelectAgentBean implements Serializable {
 
 	public void setAgentList(List<Agent> agentList) {
 		this.agentList = agentList;
+	}
+
+	public Agent getSelectedAgent() {
+		return selectedAgent;
+	}
+
+	public void setSelectedAgent(Agent selectedAgent) {
+		this.selectedAgent = selectedAgent;
 	}
 
 }

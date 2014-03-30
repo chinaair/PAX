@@ -16,8 +16,8 @@
     <h:body>
         <h:form>
         	<f:event type="preRenderView" listener="#{selectAgentBean.init}" />
-            <p:dataTable var="agent" value="#{selectAgentBean.agentList}"rowKey="#{agent.id}" selection="#{selectAgentBean.selectAgentFromDialog}" selectionMode="single">
-            
+            <p:dataTable var="agent" value="#{selectAgentBean.agentList}" rowKey="#{agent.id}" selection="#{selectAgentBean.selectedAgent}" selectionMode="single">
+            	<p:ajax event="rowSelect" listener="#{selectAgentBean.selectAgentFromDialog}" />
                 <p:column headerText="#{message.selectAgent_code}">
                     <h:outputText value="#{agent.code}" />
                 </p:column>
