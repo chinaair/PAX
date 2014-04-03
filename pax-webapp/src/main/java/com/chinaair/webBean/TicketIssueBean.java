@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Named;
@@ -45,26 +46,81 @@ public class TicketIssueBean implements Serializable {
 	
 	private BigDecimal totalAmtVnd;
 	
+	private String inputTicketNo;
+	
+	private String inputRoute;
+	
+	private int inputQuantity;
+	
+	private BigDecimal inputPrice;
+	
 	public void init() {
-		
+		ResourceBundle bundle = ResourceBundle.getBundle("com.chinaair.internationalization.AllResourceBundle");
+		bundle.getString("selectAgent_companyName");
 	}
 	
 	public void initDetail() {
-		if(ticketIssueDetails != null && !ticketIssueDetails.isEmpty()) {
+		if(inputTicketDetails == null) {
 			inputTicketDetails = new ArrayList<>();
+		}
+		if(ticketIssueDetails != null && !ticketIssueDetails.isEmpty()) {
 			for(TicketIssueDetail item : ticketIssueDetails) {
 				TicketIssueDetail newItem = new TicketIssueDetail();
 				newItem.setAmount(item.getAmount());
-				newItem.setId(item.getId());
-				newItem.setLastUpdate(item.getLastUpdate());
+				//newItem.setId(item.getId());
+				//newItem.setLastUpdate(item.getLastUpdate());
 				newItem.setPrice(item.getPrice());
 				newItem.setQuantity(item.getQuantity());
 				newItem.setRoute(item.getRoute());
-				newItem.setTicketIssue(item.getTicketIssue());
+				//newItem.setTicketIssue(item.getTicketIssue());
 				newItem.setTicketNo(item.getTicketNo());
 				inputTicketDetails.add(newItem);
 			}
 		}
+	}
+	
+	public void onSelectTicketDetail(SelectEvent event) {
+		if(selectedTicketIssueDetail != null) {
+			inputTicketNo = selectedTicketIssueDetail.getTicketNo().toString();
+			inputRoute = selectedTicketIssueDetail.getRoute();
+			inputQuantity = selectedTicketIssueDetail.getQuantity().intValue();
+			inputPrice = selectedTicketIssueDetail.getPrice();
+		}
+	}
+	
+	public void insertDetail() {
+		//check insert
+		TicketIssueDetail detail = new TicketIssueDetail();
+		detail.setTicketNo(new Long(inputTicketNo));
+		detail.setRoute(inputRoute);
+		detail.setQuantity(new Long(inputQuantity));
+		detail.setPrice(inputPrice);
+		detail.setAmount(inputPrice.multiply(new BigDecimal(inputQuantity)));
+		inputTicketDetails.add(detail);
+		selectedTicketIssueDetail = null;
+	}
+	
+	public void updateDetail() {
+		
+	}
+	
+	public void deleteDetail() {
+		if(selectedTicketIssueDetail != null) {
+			inputTicketDetails.remove(selectedTicketIssueDetail);
+			selectedTicketIssueDetail = null;
+		}
+	}
+	
+	public void okDetail() {
+		
+	}
+	
+	public void cancelDetail() {
+		
+	}
+	
+	public void clearDetail() {
+		resetFields();
 	}
 	
 	public void chooseAgent() {
@@ -78,6 +134,14 @@ public class TicketIssueBean implements Serializable {
 		if(selectedAgent != null) {
 			displayAgentName = selectedAgent.getName();
 		}
+	}
+	
+	private void resetFields() {
+		selectedTicketIssueDetail = null;
+		inputTicketNo = "";
+		inputRoute = "";
+		inputQuantity = 0;
+		inputPrice = null;
 	}
 
 	public Date getIssueDate() {
@@ -159,6 +223,46 @@ public class TicketIssueBean implements Serializable {
 
 	public void setTotalAmtVnd(BigDecimal totalAmtVnd) {
 		this.totalAmtVnd = totalAmtVnd;
+	}
+
+	public List<TicketIssueDetail> getInputTicketDetails() {
+		return inputTicketDetails;
+	}
+
+	public void setInputTicketDetails(List<TicketIssueDetail> inputTicketDetails) {
+		this.inputTicketDetails = inputTicketDetails;
+	}
+
+	public String getInputTicketNo() {
+		return inputTicketNo;
+	}
+
+	public void setInputTicketNo(String inputTicketNo) {
+		this.inputTicketNo = inputTicketNo;
+	}
+
+	public String getInputRoute() {
+		return inputRoute;
+	}
+
+	public void setInputRoute(String inputRoute) {
+		this.inputRoute = inputRoute;
+	}
+
+	public int getInputQuantity() {
+		return inputQuantity;
+	}
+
+	public void setInputQuantity(int inputQuantity) {
+		this.inputQuantity = inputQuantity;
+	}
+
+	public BigDecimal getInputPrice() {
+		return inputPrice;
+	}
+
+	public void setInputPrice(BigDecimal inputPrice) {
+		this.inputPrice = inputPrice;
 	}
 
 }

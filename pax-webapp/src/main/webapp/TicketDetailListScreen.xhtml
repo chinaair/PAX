@@ -12,7 +12,13 @@
 		<f:event type="preRenderView" listener="#{ticketIssueBean.initDetail}" />
 		<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="#{message.ticketIssue_header}" /></h1>
 		<h:panelGroup styleClass="entry" layout="block">
-			<p:panelGrid columns="2" style="width:100%; margin-top:10px;">
+			<p:toolbar>
+				<p:toolbarGroup align="left">
+					<p:commandButton type="button" value="OK" icon="ui-icon-document" actionListener="#{ticketIssueBean.okDetail}" />
+					<p:commandButton type="button" value="Cancel" icon="ui-icon-document" actionListener="#{ticketIssueBean.cancelDetail}" />
+				</p:toolbarGroup>
+			</p:toolbar>
+			<p:panelGrid id="inputArea" columns="2" style="width:100%; margin-top:10px;">
 				<f:facet name="header">
 					#{message.ticketDetail_input_header}
 				</f:facet>
@@ -24,16 +30,30 @@
 				<p:inputText id="route" value="#{ticketIssueBean.inputRoute}" label="Route" />
 				
 				<h:outputLabel for="quantity" value="Quantity:" />
-				<pe:inputNumber id="quantity" value="#{ticketIssueBean.inputQuantity}" label="Quantity" />
+				<pe:inputNumber id="quantity" value="#{ticketIssueBean.inputQuantity}" label="Quantity" decimalPlaces="0" />
 				
 				<h:outputLabel for="price" value="Price:" />
 				<pe:inputNumber id="price" value="#{ticketIssueBean.inputPrice}" label="Price" />
 				
+				<f:facet name="footer">  
+				    <p:commandButton value="#{message.rate_b_add}" actionListener="#{ticketIssueBean.insertDetail}" id="i_insert"   
+	           			 icon="ui-icon-document" ajax="false" /> 
+	           		<p:commandButton value="#{message.rate_b_update}" actionListener="#{ticketIssueBean.updateDetail}" id="i_update"   
+	           			 icon="ui-icon-disk" ajax="false"/>
+	           	 	<p:commandButton value="#{message.rate_b_del}" actionListener="#{ticketIssueBean.deleteDetail}" id="i_delete"   
+	           			 icon="ui-icon-close"  ajax="false" />
+	           		<p:commandButton value="Clear" actionListener="#{ticketIssueBean.clearDetail}" id="i_clear"   
+	           			 icon="ui-icon-close"  ajax="false" />
+			    </f:facet>
 			</p:panelGrid>
+		</h:panelGroup>
 			
-			<p:dataTable var="detail" value="#{ticketIssueBean.inputticketDetails}" rowKey="#{detail.id}" style="margin-top:10px"
+		<h:panelGroup styleClass="entry" layout="block">
+			<p:dataTable var="detail" value="#{ticketIssueBean.inputTicketDetails}" rowKey="#{detail.ticketNo}" style="margin-top:10px"
 				paginator="true" rows="10"
                 selection="#{ticketIssueBean.selectedTicketIssueDetail}" selectionMode="single">
+                <p:ajax event="rowSelect" listener="#{ticketIssueBean.onSelectTicketDetail}"   
+                    update=":frm:inputArea" />
 				<f:facet name="header">
 		           #{message.ticketIssue_list_header}
 		        </f:facet>
@@ -64,12 +84,14 @@
 		        		<p:column colspan="2" footerText="#{message.ticketIssue_total_amt_vnd}#{ticketIssueBean.totalAmtVnd}" />
 		        	</p:row>
 		        </p:columnGroup>
-		        
-		        <f:facet name="footer">
-		        	<p:commandButton ajax="false" actionListener="#{pprBean.savePerson}" value="Edit" icon="ui-icon-document" />
-		        </f:facet>
 
 			</p:dataTable>
+			<p:toolbar style="margin-top:10px;">
+				<p:toolbarGroup align="left">
+					<p:commandButton type="button" value="OK" icon="ui-icon-document" actionListener="#{ticketIssueBean.okDetail}" />
+					<p:commandButton type="button" value="Cancel" icon="ui-icon-document" actionListener="#{ticketIssueBean.cancelDetail}" />
+				</p:toolbarGroup>
+			</p:toolbar>
 		</h:panelGroup>
 	</ui:define>
 </ui:composition>
