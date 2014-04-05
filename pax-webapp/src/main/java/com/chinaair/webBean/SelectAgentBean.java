@@ -3,8 +3,11 @@ package com.chinaair.webBean;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
-import javax.enterprise.context.SessionScoped;
+import javax.enterprise.context.Conversation;
+import javax.enterprise.context.ConversationScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.primefaces.context.RequestContext;
@@ -13,7 +16,7 @@ import org.primefaces.event.SelectEvent;
 import com.chinaair.entity.Agent;
 import com.chinaair.services.AgentServiceBean;
 
-@SessionScoped
+@ConversationScoped
 @Named("selectAgentBean")
 public class SelectAgentBean implements Serializable {
 
@@ -26,6 +29,16 @@ public class SelectAgentBean implements Serializable {
 	
 	private Agent selectedAgent;
 	
+	@Inject
+	private Conversation conversation;
+	
+	public void startConversation() {
+		if(conversation.isTransient()) {
+			conversation.begin();
+		}
+	}
+	
+	@PostConstruct
 	public void init() {
 		agentList = agentService.getAllAgent();
 	}

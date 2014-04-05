@@ -25,10 +25,13 @@ public class TicketIssueDetail implements Serializable {
 	private Long id;
 	
 	@Column(name="TICKET_NO", nullable = false)
-	private Long ticketNo;
+	private String ticketNo;
+	
+	@Column(name="TICKET_ISSUE_ID", nullable = false)
+	private Long ticketIssueId;
 	
 	@ManyToOne(fetch=FetchType.EAGER)
-    @JoinColumn(name="TICKET_ISSUE_ID", insertable=true, updatable=true)
+    @JoinColumn(name="TICKET_ISSUE_ID", insertable=false, updatable=false)
 	private TicketIssue ticketIssue;
 	
 	@Column(name="ROUTE")
@@ -53,6 +56,14 @@ public class TicketIssueDetail implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public Long getTicketIssueId() {
+		return ticketIssueId;
+	}
+
+	public void setTicketIssueId(Long ticketIssueId) {
+		this.ticketIssueId = ticketIssueId;
 	}
 
 	public TicketIssue getTicketIssue() {
@@ -95,11 +106,11 @@ public class TicketIssueDetail implements Serializable {
 		this.amount = amount;
 	}
 
-	public Long getTicketNo() {
+	public String getTicketNo() {
 		return ticketNo;
 	}
 
-	public void setTicketNo(Long ticketNo) {
+	public void setTicketNo(String ticketNo) {
 		this.ticketNo = ticketNo;
 	}
 

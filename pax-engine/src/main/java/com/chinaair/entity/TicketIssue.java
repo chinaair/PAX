@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,6 +14,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
@@ -33,9 +36,6 @@ public class TicketIssue implements Serializable {
 	
 	@Column(name="ROE", nullable = false)
 	private BigDecimal roe;
-	
-	@Column(name="REFNO", nullable = false)
-	private Long refNo;
 	
 	/**
 	 * 0: Cash
@@ -61,6 +61,10 @@ public class TicketIssue implements Serializable {
 	@Version
 	@Column(name="LASTUPDATE", nullable = false)
 	private Timestamp lastUpdate;
+	
+	@OneToMany(targetEntity=TicketIssueDetail.class, mappedBy="ticketIssue")
+	@OrderBy("id")
+	private List<TicketIssueDetail> ticketIssueDetail;
 
 	public Long getId() {
 		return id;
@@ -84,14 +88,6 @@ public class TicketIssue implements Serializable {
 
 	public void setRoe(BigDecimal roe) {
 		this.roe = roe;
-	}
-
-	public Long getRefNo() {
-		return refNo;
-	}
-
-	public void setRefNo(Long refNo) {
-		this.refNo = refNo;
 	}
 
 	public String getPaymentType() {
@@ -132,6 +128,14 @@ public class TicketIssue implements Serializable {
 
 	public void setLastUpdate(Timestamp lastUpdate) {
 		this.lastUpdate = lastUpdate;
+	}
+
+	public List<TicketIssueDetail> getTicketIssueDetail() {
+		return ticketIssueDetail;
+	}
+
+	public void setTicketIssueDetail(List<TicketIssueDetail> ticketIssueDetail) {
+		this.ticketIssueDetail = ticketIssueDetail;
 	}
 
 }

@@ -9,7 +9,6 @@
         xmlns:pe="http://primefaces.org/ui/extensions"
         template="pageWithMenu.xhtml">
 	<ui:define name="content">
-		<f:event type="preRenderView" listener="#{ticketIssueBean.initDetail}" />
 		<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="#{message.ticketIssue_header}" /></h1>
 		<h:panelGroup styleClass="entry" layout="block">
 			<p:toolbar>
@@ -24,10 +23,10 @@
 				</f:facet>
 				
 				<h:outputLabel for="ticketNo" value="Ticket number:" />
-				<p:inputText id="ticketNo" value="#{ticketIssueBean.inputTicketNo}" label="Ticket number" />
+				<p:inputText id="ticketNo" value="#{ticketIssueBean.inputTicketNo}" label="Ticket number" maxlength="20" />
 				
 				<h:outputLabel for="route" value="Route:" />
-				<p:inputText id="route" value="#{ticketIssueBean.inputRoute}" label="Route" />
+				<p:inputText id="route" value="#{ticketIssueBean.inputRoute}" label="Route" maxlength="1000" />
 				
 				<h:outputLabel for="quantity" value="Quantity:" />
 				<pe:inputNumber id="quantity" value="#{ticketIssueBean.inputQuantity}" label="Quantity" decimalPlaces="0" />
@@ -50,7 +49,6 @@
 			
 		<h:panelGroup styleClass="entry" layout="block">
 			<p:dataTable var="detail" value="#{ticketIssueBean.inputTicketDetails}" rowKey="#{detail.ticketNo}" style="margin-top:10px"
-				paginator="true" rows="10"
                 selection="#{ticketIssueBean.selectedTicketIssueDetail}" selectionMode="single">
                 <p:ajax event="rowSelect" listener="#{ticketIssueBean.onSelectTicketDetail}"   
                     update=":frm:inputArea" />
@@ -88,8 +86,8 @@
 			</p:dataTable>
 			<p:toolbar style="margin-top:10px;">
 				<p:toolbarGroup align="left">
-					<p:commandButton type="button" value="OK" icon="ui-icon-document" actionListener="#{ticketIssueBean.okDetail}" />
-					<p:commandButton type="button" value="Cancel" icon="ui-icon-document" actionListener="#{ticketIssueBean.cancelDetail}" />
+					<p:commandButton value="OK" icon="ui-icon-document" action="#{ticketIssueBean.okDetail}" ajax="false" />
+					<p:commandButton value="Cancel" icon="ui-icon-document" action="#{ticketIssueBean.cancelDetail}" ajax="false" />
 				</p:toolbarGroup>
 			</p:toolbar>
 		</h:panelGroup>

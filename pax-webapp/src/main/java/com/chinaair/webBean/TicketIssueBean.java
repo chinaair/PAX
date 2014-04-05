@@ -9,16 +9,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import javax.enterprise.context.SessionScoped;
+import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
+import javax.enterprise.context.Conversation;
+import javax.enterprise.context.ConversationScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 
 import com.chinaair.entity.Agent;
+import com.chinaair.entity.TicketIssue;
 import com.chinaair.entity.TicketIssueDetail;
+import com.chinaair.services.TicketIssueServiceBean;
 
-@SessionScoped
+@ConversationScoped
 @Named("ticketIssueBean")
 public class TicketIssueBean implements Serializable {
 
@@ -28,13 +34,23 @@ public class TicketIssueBean implements Serializable {
 	
 	private BigDecimal roe;
 	
-	private String refNo;
+	private Long refNo;
 	
 	private String paymentType;
 	
 	private Agent selectedAgent;
 	
 	private String displayAgentName;
+	
+	private String inputPersonName;
+	
+	private Date reportDate;
+	
+	private String taxInvoiceNo;
+	
+	private Date modifyDatetime;
+	
+	private String modifyPersonName;
 	
 	private List<TicketIssueDetail> ticketIssueDetails;
 	
@@ -54,12 +70,31 @@ public class TicketIssueBean implements Serializable {
 	
 	private BigDecimal inputPrice;
 	
+	@EJB
+	private TicketIssueServiceBean ticketIssueService;
+	
+	@Inject
+	private Conversation conversation;
+	
+	public void startConversation() {
+		if(conversation.isTransient()) {
+			conversation.begin();
+		}
+	}
+	
+	@PostConstruct
 	public void init() {
 		ResourceBundle bundle = ResourceBundle.getBundle("com.chinaair.internationalization.AllResourceBundle");
 		bundle.getString("selectAgent_companyName");
 	}
 	
+	public String gotoEditDetailScreen() {
+		initDetail();
+		return "TicketDetailListScreen?faces-redirect=true";
+	}
+	
 	public void initDetail() {
+		resetFields();
 		if(inputTicketDetails == null) {
 			inputTicketDetails = new ArrayList<>();
 		}
@@ -91,17 +126,24 @@ public class TicketIssueBean implements Serializable {
 	public void insertDetail() {
 		//check insert
 		TicketIssueDetail detail = new TicketIssueDetail();
-		detail.setTicketNo(new Long(inputTicketNo));
+		detail.setTicketNo(inputTicketNo);
 		detail.setRoute(inputRoute);
 		detail.setQuantity(new Long(inputQuantity));
 		detail.setPrice(inputPrice);
 		detail.setAmount(inputPrice.multiply(new BigDecimal(inputQuantity)));
 		inputTicketDetails.add(detail);
-		selectedTicketIssueDetail = null;
+		resetFields();
 	}
 	
 	public void updateDetail() {
-		
+		if(selectedTicketIssueDetail != null) {
+			selectedTicketIssueDetail.setTicketNo(inputTicketNo);
+			selectedTicketIssueDetail.setRoute(inputRoute);
+			selectedTicketIssueDetail.setQuantity(new Long(inputQuantity));
+			selectedTicketIssueDetail.setPrice(inputPrice);
+			selectedTicketIssueDetail.setAmount(inputPrice.multiply(new BigDecimal(inputQuantity)));
+		}
+		resetFields();
 	}
 	
 	public void deleteDetail() {
@@ -109,14 +151,20 @@ public class TicketIssueBean implements Serializable {
 			inputTicketDetails.remove(selectedTicketIssueDetail);
 			selectedTicketIssueDetail = null;
 		}
+		resetFields();
 	}
 	
-	public void okDetail() {
-		
+	public String okDetail() {
+		ticketIssueDetails = inputTicketDetails;
+		inputTicketDetails = null;
+		resetFields();
+		return "TicketIssueScreen?faces-redirect=true";
 	}
 	
-	public void cancelDetail() {
-		
+	public String cancelDetail() {
+		inputTicketDetails = null;
+		resetFields();
+		return "TicketIssueScreen?faces-redirect=true";
 	}
 	
 	public void clearDetail() {
@@ -136,10 +184,20 @@ public class TicketIssueBean implements Serializable {
 		}
 	}
 	
+	public void registerTicketIssue() {
+		TicketIssue ticketIssue = new TicketIssue();
+		ticketIssue.setIssueDate(issueDate);
+		ticketIssue.setRoe(roe);
+		ticketIssue.setPaymentType(paymentType);
+		ticketIssue.setAgent(selectedAgent);
+		ticketIssue.setTicketIssueDetail(ticketIssueDetails);
+		ticketIssueService.insertTicketIssue(ticketIssue);
+	}
+	
 	private void resetFields() {
 		selectedTicketIssueDetail = null;
-		inputTicketNo = "";
-		inputRoute = "";
+		inputTicketNo = null;
+		inputRoute = null;
 		inputQuantity = 0;
 		inputPrice = null;
 	}
@@ -160,11 +218,15 @@ public class TicketIssueBean implements Serializable {
 		this.roe = roe;
 	}
 
-	public String getRefNo() {
+	public Long getRefNo() {
 		return refNo;
 	}
+	
+	public String getRefNoFormatted() {
+		return String.format("%06d", refNo);
+	}
 
-	public void setRefNo(String refNo) {
+	public void setRefNo(Long refNo) {
 		this.refNo = refNo;
 	}
 
@@ -190,6 +252,54 @@ public class TicketIssueBean implements Serializable {
 
 	public void setDisplayAgentName(String displayAgentName) {
 		this.displayAgentName = displayAgentName;
+	}
+
+	public String getInputPersonName() {
+		return inputPersonName;
+	}
+
+	public void setInputPersonName(String inputPersonName) {
+		this.inputPersonName = inputPersonName;
+	}
+
+	public Date getReportDate() {
+		return reportDate;
+	}
+
+	public void setReportDate(Date reportDate) {
+		this.reportDate = reportDate;
+	}
+
+	public String getTaxInvoiceNo() {
+		return taxInvoiceNo;
+	}
+
+	public void setTaxInvoiceNo(String taxInvoiceNo) {
+		this.taxInvoiceNo = taxInvoiceNo;
+	}
+
+	public Date getModifyDatetime() {
+		return modifyDatetime;
+	}
+
+	public void setModifyDatetime(Date modifyDatetime) {
+		this.modifyDatetime = modifyDatetime;
+	}
+
+	public String getModifyPersonName() {
+		return modifyPersonName;
+	}
+
+	public void setModifyPersonName(String modifyPersonName) {
+		this.modifyPersonName = modifyPersonName;
+	}
+
+	public Conversation getConversation() {
+		return conversation;
+	}
+
+	public void setConversation(Conversation conversation) {
+		this.conversation = conversation;
 	}
 
 	public List<TicketIssueDetail> getTicketIssueDetails() {

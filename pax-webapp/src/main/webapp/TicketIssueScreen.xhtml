@@ -9,7 +9,7 @@
         xmlns:pe="http://primefaces.org/ui/extensions"
         template="pageWithMenu.xhtml">
 	<ui:define name="content">
-		<f:event type="preRenderView" listener="#{ticketIssueBean.init}" />
+		<f:event type="preRenderView" listener="#{ticketIssueBean.startConversation}" />
 		<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="#{message.ticketIssue_header}" /></h1>
 		<h:panelGroup styleClass="entry" layout="block">
 			<p:toolbar>
@@ -19,19 +19,16 @@
 			</p:toolbar>
 			<p:panelGrid columns="2" style="width:100%; margin-top:10px;">
 				<f:facet name="header">
-					#{message.ticketIssue_input_header}
+					#{message.ticketIssue_input_header} <h:outputText rendered="#{not empty ticketIssueBean.refNo}" value="(Ref No: #{ticketIssueBean.refNoFormatted})" />
 				</f:facet>
 				
-				<h:outputLabel for="issueDate" value="Issue Date:" />
+				<h:outputLabel for="issueDate" value="Issue Date" />
 				<p:calendar id="issueDate" value="#{ticketIssueBean.issueDate}" showOn="button" />
 				
-				<h:outputLabel for="roe" value="ROE:" />
+				<h:outputLabel for="roe" value="ROE" />
 				<pe:inputNumber id="roe" value="#{ticketIssueBean.roe}" label="ROE" />
 				
-				<h:outputLabel for="refNo" value="Ref No.:" />
-				<p:inputText id="refNo" value="#{ticketIssueBean.refNo}" label="Ref No." />
-				
-				<h:outputLabel for="paymentType" value="Payment type:" />
+				<h:outputLabel for="paymentType" value="Payment type" />
 				<p:selectOneRadio id="paymentType" value="#{ticketIssueBean.paymentType}">
 					<f:selectItem itemLabel="Cash base" itemValue="0" />
 					<f:selectItem itemLabel="Credit card" itemValue="1" />
@@ -39,7 +36,7 @@
 					<f:selectItem itemLabel="Account receivable" itemValue="3" />
 				</p:selectOneRadio>
 				
-				<h:outputLabel for="agent" value="Agent:" />
+				<h:outputLabel for="agent" value="Agent" />
 				<h:panelGroup>
 					<p:inputText id="agent" value="#{ticketIssueBean.displayAgentName}" label="Agent" readonly="true" />
 					<p:commandButton icon="ui-icon-extlink" actionListener="#{ticketIssueBean.chooseAgent}">
@@ -47,11 +44,31 @@
 					</p:commandButton>
 				</h:panelGroup>
 				
+				<h:outputLabel value="Input SD" />
+				<h:outputText value="#{ticketIssueBean.inputPersonName}" />
+				
 			</p:panelGrid>
 			
-			<p:dataTable var="detail" value="#{ticketIssueBean.ticketIssueDetails}" rowKey="#{detail.id}" style="margin-top:10px"
-				paginator="true" rows="10"
-                selection="#{ticketIssueBean.selectedTicketIssueDetail}" selectionMode="single">
+			<p:panelGrid columns="2" style="width:100%; margin-top:10px;">
+				<f:facet name="header">
+					#{message.ticketIssue_addition_header}
+				</f:facet>
+				
+				<h:outputLabel value="Report date" />
+				<h:outputText value="#{ticketIssueBean.reportDate}" />
+				
+				<h:outputLabel value="Tax Inv No." />
+				<h:outputText value="#{ticketIssueBean.taxInvoiceNo}" />
+				
+				<h:outputLabel value="Modify date time" />
+				<h:outputText value="#{ticketIssueBean.modifyDatetime}" />
+				
+				<h:outputLabel value="Modify by" />
+				<h:outputText value="#{ticketIssueBean.modifyPersonName}" />
+				
+			</p:panelGrid>
+			
+			<p:dataTable var="detail" value="#{ticketIssueBean.ticketIssueDetails}" style="margin-top:10px">
 				<f:facet name="header">
 		           #{message.ticketIssue_list_header}
 		        </f:facet>
@@ -84,13 +101,13 @@
 		        </p:columnGroup>
 		        
 		        <f:facet name="footer">
-		        	<p:button outcome="TicketDetailListScreen" value="Edit" icon="ui-icon-document" />
+		        	<p:commandButton value="Edit" icon="ui-icon-document" action="#{ticketIssueBean.gotoEditDetailScreen}" ajax="false" />
 		        </f:facet>
 
 			</p:dataTable>
 			<p:toolbar style="margin-top:10px;">
 				<p:toolbarGroup align="left">
-					<p:commandButton type="button" value="Create" icon="ui-icon-document" />
+					<p:commandButton value="Create" icon="ui-icon-document" action="#{ticketIssueBean.registerTicketIssue}" ajax="false" />
 				</p:toolbarGroup>
 			</p:toolbar>
 		</h:panelGroup>
