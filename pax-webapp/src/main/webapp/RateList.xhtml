@@ -10,45 +10,57 @@
 	<ui:define name="content">
 		<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="#{message.home_header}" /></h1>
 		<h:panelGroup styleClass="entry" layout="block" style="margin-top:20px;margin-bottom:20px">
-		 	 <p:messages id="msgs"/>  
-			<p:panelGrid columns="2" style="width:100%" id="display1"> 
+		 	<p:messages id="messages" showDetail="false" autoUpdate="true" closable="false" /> 
+			<p:panelGrid columns="2" style="width:100%" id="display"> 
 				<f:event type="preRenderView" listener="#{rateBean.init}" />
 				<f:facet name="header">  
 		           Exchange Rate
 		        </f:facet> 
 			    <h:outputLabel for="popupButtonCal" value="Datetime: *" style="width:5%" />  
-			  	<p:calendar value="#{rateBean.rateInfo.datetime}" id="popupButtonCal" required="true" label="Date time"  showOn="button" style="width:50%"/>  
+			  	<p:calendar value="#{rateBean.selectedRateInfo.datetime}" id="popupButtonCal" 
+			  				required="true" label="Date time"  showOn="button" style="width:50%"
+			  				 disabled="#{rateBean.selectRow}"/>  
 			  
 			  	 
 			    <h:outputLabel for="rate" value="Rate *" style="width:5%"/>  
-			    <p:inputText id="rate" value="#{rateBean.rateInfo.rate}" maxlength="10" required="true" label="Rate" style="width:50%">
+			    <p:inputText id="rate" value="#{rateBean.selectedRateInfo.rate}" maxlength="10" required="true" label="Rate" style="width:50%">
 			    	<f:converter converterId="javax.faces.Double" />
 			    </p:inputText>  
 			    
 			    
 			    <f:facet name="footer">  
-				    <p:commandButton value="#{message.rate_b_add}" actionListener="#{rateBean.insert}" id="i_insert"   
-	           			 icon="ui-icon-document" ajax="false" /> 
-	           		<p:commandButton value="#{message.rate_b_update}" actionListener="#{rateBean.update}" id="i_update"   
-	           			 icon="ui-icon-disk" ajax="false"/>
-	           	 	<p:commandButton value="#{message.rate_b_del}" actionListener="#{rateBean.delete}" id="i_delete"   
-	           			 icon="ui-icon-close"  ajax="false" />
-	           		<p:commandButton value="#{message.rate_b_find}" actionListener="#{rateBean.find}" id="i_find"   
-	           			icon="ui-icon-search"  ajax="false" />
+				    <p:commandButton value="#{message.rate_b_add}" actionListener="#{rateBean.insert}" id="i_insert"  update=":frm:display :frm:popupButtonCal :frm:rate"
+	           			 icon="ui-icon-document" ajax="false" disabled="#{rateBean.selectRow}" /> 
+	           		<p:commandButton value="#{message.rate_b_update}" actionListener="#{rateBean.update}" id="i_update"   update=":frm:display :frm:popupButtonCal :frm:rate"
+	           			 icon="ui-icon-disk" ajax="false" disabled="#{!rateBean.selectRow}" />
+	           	 	<p:commandButton value="#{message.rate_b_del}" actionListener="#{rateBean.delete}" id="i_delete"   update=":frm:display :frm:popupButtonCal :frm:rate"
+	           			 icon="ui-icon-close"  ajax="false" disabled="#{!rateBean.selectRow}" />
+	           		<p:commandButton value="#{message.rate_b_clear}" actionListener="#{rateBean.clear}" id="i_clear"   update=":frm:display :frm:popupButtonCal :frm:rate"
+	           			icon="ui-icon-refresh"  ajax="false" immediate="true" />
 			    </f:facet>  
 			</p:panelGrid>  
 		</h:panelGroup>
+		 <p:fragment autoUpdate="true">  
+				<h:panelGroup styleClass="entry" layout="block">
+            		<p:calendar value="#{rateBean.selectedRateInfo.datetime}" id="searchDate" 
+			  				label="Date time"  showOn="button" style="width:50%"/>
+			  		<p:commandButton value="#{message.rate_b_find}" actionListener="#{rateBean.find}" id="i_find"   update=":frm:display :frm:popupButtonCal :frm:rate"
+	           			icon="ui-icon-search"  ajax="true"  immediate="false" />
+           		 </h:panelGroup>
+		 </p:fragment>
+		
 		<h:panelGroup styleClass="entry" layout="block">
 			<p:dataTable value="#{rateBean.rateInfoList}" var="rate"
 				rowKey="#{rate.id}" selection="#{rateBean.rateInfo}"
 				paginator="true" rows="10"
 				selectionMode="single">
   			<p:ajax event="rowSelect" listener="#{rateBean.onRowSelect}"   
-                    update=":frm:display1 :frm:display" />  
+                    update=":frm:display" />  
+            
 	        <f:facet name="header">  
 	           Exchange Rate List
 	        </f:facet>  
-	  
+	  		
 	        <p:column headerText="Datetime">  
 	           <h:outputText value="#{rate.datetime}"> <f:convertDateTime pattern="dd/MM/yyyy"/></h:outputText>
 	        </p:column>  
@@ -58,25 +70,7 @@
 	        </p:column>  
 	  
     </p:dataTable>  
-    	<p:dialog header="Rate Detail" widgetVar="rateDialog" resizable="false" id="carDlg"  
-                showEffect="fade" hideEffect="explode" modal="true">  
-  
-        <h:panelGrid id="display" columns="2" cellpadding="4" style="margin:0 auto;">  
-  
-     
-  
-          		<h:outputLabel for="popupButtonCal1" value="Datetime: *" style="width:5%" />  
-			  	<p:calendar value="#{rateBean.rateInfo.datetime}" id="popupButtonCal1" required="true" label="Date time"  showOn="button" style="width:50%"/>  
-			  	
-			  	 
-			    <h:outputLabel for="rate1" value="Rate *" style="width:5%"/>  
-			    <p:inputText id="rate1" value="#{rateBean.rateInfo.rate}" maxlength="10" required="true" label="Rate" style="width:50%">
-			    	<f:converter converterId="javax.faces.Double" />
-			    </p:inputText>  
-  
-        </h:panelGrid>  
-  
-    </p:dialog>  
+    
 		</h:panelGroup>
 	</ui:define>
 </ui:composition>

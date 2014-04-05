@@ -29,32 +29,44 @@ public class RateServiceBean {
 	}
 	
 	public Rate getRateById(Long id) {
-		Rate rate = em.find(Rate.class, id);
-		return rate;
+		if(id !=null){
+			Rate rate = em.find(Rate.class, id);
+			return rate;
+		}
+		return null;
 	}
-	public Rate getRateByDatetime(Date datetime) {
-		StringBuffer strbuffer = new StringBuffer(); 
-		strbuffer.append("Select rate ")
-		         .append("From Rate as rate ")
-		         .append("Where rate.datetime = ?1");
-		Query query = em.createQuery(strbuffer.toString());
-		query.setParameter(1, datetime);
-		List<Rate> list = query.getResultList(); 
-		return list.get(0);
+	public List<Rate> getRateByDatetime(Date datetime) {
+		if(datetime !=null){
+			StringBuffer strbuffer = new StringBuffer(); 
+			strbuffer.append("Select rate ")
+			         .append("From Rate as rate ")
+			         .append("Where rate.datetime = ?1");
+			Query query = em.createQuery(strbuffer.toString());
+			query.setParameter(1, datetime);
+			return  query.getResultList();
+		}
+		return null;
 	}
 	public void insert(Rate rate){
-		em.persist(rate);
-		em.flush();
+		if(rate !=null){
+			em.persist(rate);
+			em.flush();
+		}
+		
 	}
 	public void update(Rate rate){
-		/*RateInfo curRate = em.find(RateInfo.class,rate.getId());
-		curRate.setDatetime(rate.getDatetime());
-		curRate.setRate(rate.getRate());
-		em.merge(rate);
-		em.flush();*/
+		if(rate !=null){
+			Rate curRate = em.find(Rate.class,rate.getId());
+			curRate.setRate(rate.getRate());
+			em.merge(rate);
+			em.flush();
+		}
 	}
 	public void delete(Rate rate){
-		em.remove(rate);
-		em.flush();
+		if(rate !=null){
+			Rate curRate = em.find(Rate.class,rate.getId());
+			em.remove(curRate);
+			em.flush();
+		}
 	}
 }

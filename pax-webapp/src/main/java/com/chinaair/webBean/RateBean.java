@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.annotation.PreDestroy;
 import javax.ejb.EJB;
 import javax.enterprise.context.SessionScoped;
+import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
@@ -42,10 +43,10 @@ public class RateBean implements Serializable {
 	private Rate selectedRateInfo;
 	
 	private Rate rateInfo;
+	
+	private boolean isSelectRow = false;
 
-    private Double amount;  
-
-    private Date date;  
+	private Date searchDate;
 	
 	public void init() {
 		countries = new LinkedHashMap<String,Object>();
@@ -54,60 +55,76 @@ public class RateBean implements Serializable {
 		rateInfoList = new ArrayList<Rate>();
 		rateInfoList = rateService.getRateList();
 		rateInfo = new Rate();
-		date = null;
-		amount = null;
 		loadRateList();
 	}
 	
 	public void loadRateList(){
 		rateInfoList = new ArrayList<Rate>();
 		rateInfoList = rateService.getRateList();
+		rateInfo = null;
 	}
 	
 	public String insert(){
-		if(date!=null && amount!=null){
-			Rate rate = new Rate(); 
-			rate.setDatetime(date);
-			rate.setRate(amount);
-			rateService.insert(rate);
-			loadRateList();
+		if(selectedRateInfo!=null){
+			List<Rate> list = rateService.getRateByDatetime(selectedRateInfo.getDatetime());
+			if(list == null || list.isEmpty()) {
+				Rate rate = new Rate();
+				rate.setDatetime(selectedRateInfo.getDatetime());
+				rate.setRate(selectedRateInfo.getRate());
+				rateService.insert(rate);
+				loadRateList();
+				setSelectRow(false);
+				selectedRateInfo = new Rate();
+			} else{
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Insert Rate", "Đã tồn tại ngày tỷ giá"));  
+			}
 		}
-		date = null;
-		amount = null;
 		return  "";
 	}
 	public String update(){
-		if(selectedRateInfo!=null && date!=null && amount!=null){
-			selectedRateInfo.setDatetime(date);
-			selectedRateInfo.setRate(amount);
+		if(selectedRateInfo!=null){
 			rateService.update(selectedRateInfo);
 			loadRateList();
+			setSelectRow(false);
+			selectedRateInfo = new Rate();
 		}
-		date = null;
-		amount = null;
 		return  "";
 	}
 	public String delete(){
 		if(selectedRateInfo!=null){
 			rateService.delete(selectedRateInfo);
 			loadRateList();	
+			setSelectRow(false);
+			selectedRateInfo = new Rate();
 		}
-		date = null;
-		amount = null;
 		return  "";
 	}
 	public String find(){
-		if(date!=null && amount!=null){
-			Rate rate = rateService.getRateByDatetime(date);
-			date = rate.getDatetime();
-			amount = rate.getRate();
+		if(selectedRateInfo!=null && selectedRateInfo.getDatetime()!=null){
+			rateInfoList = new ArrayList<Rate>();
+			rateInfoList = rateService.getRateByDatetime(selectedRateInfo.getDatetime());
+			if(rateInfoList != null && !rateInfoList.isEmpty()){
+				selectedRateInfo = new Rate();
+				rateInfo = null;
+				setSelectRow(false);
+			}else{
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Find Rate", "Chưa có tỷ giá ngày được chọn! "));
+			}
+			
+		} else{
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Find Rate", "Vui lòng chọn ngày cần tìm! "));
 		}
 		return  "";
 	}
+	public void clear(){
+		selectedRateInfo = new Rate();
+		loadRateList();	
+		setSelectRow(false);
+		rateInfo = null;
+	}
 	public void onRowSelect(SelectEvent event) {  
-		date = rateInfo.getDatetime();
-		amount = rateInfo.getRate();
 		selectedRateInfo = rateInfo;
+		setSelectRow(true);
     }  
 	private boolean checkError(){
 		boolean error1 = CommonUtils.isThisDateValid(rateInfo.getDatetime().toString(), "dd/mm/yyyy");
@@ -178,19 +195,20 @@ public class RateBean implements Serializable {
 		
 	}
 
-	public Double getAmount() {
-		return amount;
+	public boolean isSelectRow() {
+		return isSelectRow;
 	}
 
-	public void setAmount(Double amount) {
-		this.amount = amount;
+	public void setSelectRow(boolean isSelectRow) {
+		this.isSelectRow = isSelectRow;
 	}
 
-	public Date getDate() {
-		return date;
+	public Date getSearchDate() {
+		return searchDate;
 	}
 
-	public void setDate(Date date) {
-		this.date = date;
+	public void setSearchDate(Date searchDate) {
+		this.searchDate = searchDate;
 	}
+
 }
