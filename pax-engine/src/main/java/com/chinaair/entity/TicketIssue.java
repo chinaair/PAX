@@ -16,11 +16,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
+import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
-@Entity(name="TICKET_ISSUE")
+@Entity
+@Table(name="TICKET_ISSUE")
 public class TicketIssue implements Serializable {
 	
 	private static final long serialVersionUID = 5760668219804774494L;
@@ -72,6 +74,10 @@ public class TicketIssue implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+	
+	public String getFormattedId() {
+		return String.format("%06d", id);
 	}
 
 	public Date getIssueDate() {

@@ -9,7 +9,6 @@
         xmlns:pe="http://primefaces.org/ui/extensions"
         template="pageWithMenu.xhtml">
 	<ui:define name="content">
-		<f:event type="preRenderView" listener="#{ticketIssueBean.startConversation}" />
 		<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="#{message.ticketIssue_header}" /></h1>
 		<h:panelGroup styleClass="entry" layout="block">
 			<p:toolbar>

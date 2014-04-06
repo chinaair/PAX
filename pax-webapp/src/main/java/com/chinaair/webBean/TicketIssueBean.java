@@ -30,6 +30,15 @@ public class TicketIssueBean implements Serializable {
 
 	private static final long serialVersionUID = -1953274038082422040L;
 	
+	@EJB
+	private TicketIssueServiceBean ticketIssueService;
+	
+	private static final String NEW = "0";
+	
+	private static final String VIEW = "1";
+	
+	private static final String EDIT = "2";
+	
 	private Date issueDate;
 	
 	private BigDecimal roe;
@@ -52,9 +61,13 @@ public class TicketIssueBean implements Serializable {
 	
 	private String modifyPersonName;
 	
+	private List<TicketIssue> ticketIssueList;
+	
 	private List<TicketIssueDetail> ticketIssueDetails;
 	
 	private List<TicketIssueDetail> inputTicketDetails;
+	
+	private TicketIssue selectedTicketIssue;
 	
 	private TicketIssueDetail selectedTicketIssueDetail;
 	
@@ -70,8 +83,19 @@ public class TicketIssueBean implements Serializable {
 	
 	private BigDecimal inputPrice;
 	
-	@EJB
-	private TicketIssueServiceBean ticketIssueService;
+	private String screenMode;
+	
+	private Date searchStartDate;
+	
+	private Date searchEndDate;
+	
+	private String searchRefNo;
+	
+	private String searchAgentName;
+	
+	private Agent searchAgent;
+	
+	private String searchStatus;
 	
 	@Inject
 	private Conversation conversation;
@@ -86,6 +110,25 @@ public class TicketIssueBean implements Serializable {
 	public void init() {
 		ResourceBundle bundle = ResourceBundle.getBundle("com.chinaair.internationalization.AllResourceBundle");
 		bundle.getString("selectAgent_companyName");
+		ticketIssueList = ticketIssueService.findTicketIssueList();
+	}
+	
+	public String gotoNewTicketIssueScreen() {
+		screenMode = NEW;
+		return "TicketIssueScreen?faces-redirect=true";
+	}
+	
+	public String gotoViewTicketIssueScreen() {
+		screenMode = VIEW;
+		return "TicketIssueScreen?faces-redirect=true";
+	}
+	
+	public void printTicketIssueInfo() {
+		
+	}
+	
+	public void searchTicketIssue() {
+		ticketIssueList = ticketIssueService.findTicketIssueList();
 	}
 	
 	public String gotoEditDetailScreen() {
@@ -184,7 +227,14 @@ public class TicketIssueBean implements Serializable {
 		}
 	}
 	
-	public void registerTicketIssue() {
+	public void onSearchAgentChosen(SelectEvent event) {
+		searchAgent = (Agent)event.getObject();
+		if(searchAgent != null) {
+			searchAgentName = searchAgent.getName();
+		}
+	}
+	
+	public String registerTicketIssue() {
 		TicketIssue ticketIssue = new TicketIssue();
 		ticketIssue.setIssueDate(issueDate);
 		ticketIssue.setRoe(roe);
@@ -192,6 +242,7 @@ public class TicketIssueBean implements Serializable {
 		ticketIssue.setAgent(selectedAgent);
 		ticketIssue.setTicketIssueDetail(ticketIssueDetails);
 		ticketIssueService.insertTicketIssue(ticketIssue);
+		return "TicketIssueListScreen?faces-redirect=true";
 	}
 	
 	private void resetFields() {
@@ -373,6 +424,86 @@ public class TicketIssueBean implements Serializable {
 
 	public void setInputPrice(BigDecimal inputPrice) {
 		this.inputPrice = inputPrice;
+	}
+
+	public List<TicketIssue> getTicketIssueList() {
+		return ticketIssueList;
+	}
+
+	public void setTicketIssueList(List<TicketIssue> ticketIssueList) {
+		this.ticketIssueList = ticketIssueList;
+	}
+
+	public TicketIssue getSelectedTicketIssue() {
+		return selectedTicketIssue;
+	}
+
+	public void setSelectedTicketIssue(TicketIssue selectedTicketIssue) {
+		this.selectedTicketIssue = selectedTicketIssue;
+	}
+
+	public String getScreenMode() {
+		return screenMode;
+	}
+
+	public void setScreenMode(String screenMode) {
+		this.screenMode = screenMode;
+	}
+
+	public Date getSearchStartDate() {
+		return searchStartDate;
+	}
+
+	public void setSearchStartDate(Date searchStartDate) {
+		this.searchStartDate = searchStartDate;
+	}
+
+	public Date getSearchEndDate() {
+		return searchEndDate;
+	}
+
+	public void setSearchEndDate(Date searchEndDate) {
+		this.searchEndDate = searchEndDate;
+	}
+
+	public String getSearchRefNo() {
+		return searchRefNo;
+	}
+
+	public void setSearchRefNo(String searchRefNo) {
+		this.searchRefNo = searchRefNo;
+	}
+
+	public String getSearchAgentName() {
+		return searchAgentName;
+	}
+
+	public void setSearchAgentName(String searchAgentName) {
+		this.searchAgentName = searchAgentName;
+	}
+
+	public Agent getSearchAgent() {
+		return searchAgent;
+	}
+
+	public void setSearchAgent(Agent searchAgent) {
+		this.searchAgent = searchAgent;
+	}
+
+	public String getSearchStatus() {
+		return searchStatus;
+	}
+
+	public void setSearchStatus(String searchStatus) {
+		this.searchStatus = searchStatus;
+	}
+
+	public TicketIssueServiceBean getTicketIssueService() {
+		return ticketIssueService;
+	}
+
+	public void setTicketIssueService(TicketIssueServiceBean ticketIssueService) {
+		this.ticketIssueService = ticketIssueService;
 	}
 
 }

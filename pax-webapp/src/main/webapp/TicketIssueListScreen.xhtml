@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:pe="http://primefaces.org/ui/extensions"
+        template="pageWithMenu.xhtml">
+	<ui:define name="content">
+		<f:event type="preRenderView" listener="#{ticketIssueBean.startConversation}" />
+		<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="#{message.ticketIssue_header}" /></h1>
+		<h:panelGroup styleClass="entry" layout="block">
+			<p:toolbar>
+				<p:toolbarGroup align="left">
+					<p:commandButton value="New" icon="ui-icon-document" action="#{ticketIssueBean.gotoNewTicketIssueScreen}" ajax="false" />
+					<p:commandButton value="View" icon="ui-icon-document" action="#{ticketIssueBean.gotoViewTicketIssueScreen}" ajax="false" />
+					<p:commandButton value="Print" icon="ui-icon-document" action="#{ticketIssueBean.printTicketIssueInfo}" ajax="false" />
+				</p:toolbarGroup>
+			</p:toolbar>
+			
+			<p:panel header="Search condition" toggleable="true" toggleSpeed="500" closeSpeed="500" widgetVar="panel" collapsed="true" style="margin-top:10px">
+				<table border="0" cellspacing="0" cellpadding="0" width="100%">
+					<tr>
+						<td><p:outputLabel for="searhStart" value="Start date:" /></td>
+						<td><p:calendar id="searhStart" value="#{ticketIssueBean.searchStartDate}" showOn="button" /></td>
+						<td><p:outputLabel for="searhEnd" value="End date:" /></td>
+						<td><p:calendar id="searhEnd" value="#{ticketIssueBean.searchEndDate}" showOn="button" /></td>
+						<td><p:outputLabel for="searchRefNo" value="Refer number:" /></td>
+						<td><p:inputText id="searchRefNo" value="#{ticketIssueBean.searchRefNo}" label="Search refer number" /></td>
+					</tr>
+					<tr>
+						<td><p:outputLabel for="searchAgent" value="Agent" /></td>
+						<td>
+							<h:panelGroup>
+								<p:inputText id="searchAgent" value="#{ticketIssueBean.searchAgentName}" label="Agent" readonly="true" />
+								<p:commandButton icon="ui-icon-extlink" actionListener="#{ticketIssueBean.chooseAgent}">
+									<p:ajax event="dialogReturn" listener="#{ticketIssueBean.onSearchAgentChosen}" update="searchAgent" />
+								</p:commandButton>
+							</h:panelGroup>
+						</td>
+						<td><p:outputLabel for="searchStatus" value="Status" /></td>
+						<td>
+							<p:selectOneMenu id="searchStatus" value="#{ticketIssueBean.searchStatus}">
+					            <f:selectItem itemLabel="No tax invoice" itemValue="0" />
+					            <f:selectItem itemLabel="Has tax invoice" itemValue="1" />
+					            <f:selectItem itemLabel="Voided" itemValue="2" />
+					        </p:selectOneMenu>
+						</td>
+						<td colspan="2" align="left"><p:commandButton value="Search" icon="ui-icon-document" action="#{ticketIssueBean.searchTicketIssue}" ajax="false" /></td>
+					</tr>
+				</table>
+			</p:panel>
+			<p:dataTable var="detail" value="#{ticketIssueBean.ticketIssueList}" rowKey="#{detail.id}" style="margin-top:10px"
+                selection="#{ticketIssueBean.selectedTicketIssue}" selectionMode="single">
+				<f:facet name="header">
+		           #{message.ticketIssue_list_header}
+		        </f:facet>
+				<p:column headerText="Issue date">
+		            <h:outputText value="#{detail.issueDate}">
+		            	<f:convertDateTime pattern="dd/MM/yyyy" />
+		            </h:outputText>
+		        </p:column>
+		        
+		        <p:column headerText="Refer Number">
+		            #{detail.formattedId}
+		        </p:column>
+		        
+		        <p:column headerText="Agent">
+		            #{detail.agent.name}
+		        </p:column>
+		        
+		        <p:column headerText="Amount USD">
+		            Amount USD
+		        </p:column>
+		        
+		        <p:column headerText="Status">
+		            Status
+		        </p:column>
+		        
+			</p:dataTable>
+			
+			<p:toolbar style="margin-top:10px;">
+				<p:toolbarGroup align="left">
+					<p:commandButton value="New" icon="ui-icon-document" action="#{ticketIssueBean.gotoNewTicketIssueScreen}" ajax="false" />
+					<p:commandButton value="View" icon="ui-icon-document" action="#{ticketIssueBean.gotoViewTicketIssueScreen}" ajax="false" />
+					<p:commandButton value="Print" icon="ui-icon-document" action="#{ticketIssueBean.printTicketIssueInfo}" ajax="false" />
+				</p:toolbarGroup>
+			</p:toolbar>
+		</h:panelGroup>
+			
+	</ui:define>
+</ui:composition>

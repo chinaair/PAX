@@ -12,9 +12,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.persistence.Version;
 
-@Entity(name="TICKET_ISSUE_DETAIL")
+@Entity
+@Table(name="TICKET_ISSUE_DETAIL")
 public class TicketIssueDetail implements Serializable {
 
 	private static final long serialVersionUID = 1122796517955938489L;

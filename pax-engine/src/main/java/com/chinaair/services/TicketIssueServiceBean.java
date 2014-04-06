@@ -31,5 +31,9 @@ public class TicketIssueServiceBean {
 		}
 		em.flush();
 	}
+	
+	public List<TicketIssue> findTicketIssueList() {
+		return em.createQuery("SELECT t FROM TicketIssue t", TicketIssue.class).getResultList();
+	}
 
 }
