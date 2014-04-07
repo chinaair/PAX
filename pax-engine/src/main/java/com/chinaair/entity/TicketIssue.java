@@ -64,6 +64,17 @@ public class TicketIssue implements Serializable {
 	@Column(name="LASTUPDATE", nullable = false)
 	private Timestamp lastUpdate;
 	
+	/**
+	 * 0: has no tax invoice
+	 * 1: has tax invoice
+	 * 2: voided
+	 */
+	@Column(name="STATUS", nullable = false)
+	private String status;
+	
+	@Column(name="AMT_USD")
+	private BigDecimal amount_usd;
+	
 	@OneToMany(targetEntity=TicketIssueDetail.class, mappedBy="ticketIssue")
 	@OrderBy("id")
 	private List<TicketIssueDetail> ticketIssueDetail;
@@ -134,6 +145,22 @@ public class TicketIssue implements Serializable {
 
 	public void setLastUpdate(Timestamp lastUpdate) {
 		this.lastUpdate = lastUpdate;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public BigDecimal getAmount_usd() {
+		return amount_usd;
+	}
+
+	public void setAmount_usd(BigDecimal amount_usd) {
+		this.amount_usd = amount_usd;
 	}
 
 	public List<TicketIssueDetail> getTicketIssueDetail() {

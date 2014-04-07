@@ -120,6 +120,14 @@ public class TicketIssueBean implements Serializable {
 	
 	public String gotoViewTicketIssueScreen() {
 		screenMode = VIEW;
+		if(selectedTicketIssue != null) {
+			issueDate = selectedTicketIssue.getIssueDate();
+			roe = selectedTicketIssue.getRoe();
+			paymentType = selectedTicketIssue.getPaymentType();
+			selectedAgent = selectedTicketIssue.getAgent();
+			displayAgentName = selectedAgent.getName();
+			ticketIssueDetails = selectedTicketIssue.getTicketIssueDetail();
+		}
 		return "TicketIssueScreen?faces-redirect=true";
 	}
 	
@@ -241,6 +249,7 @@ public class TicketIssueBean implements Serializable {
 		ticketIssue.setPaymentType(paymentType);
 		ticketIssue.setAgent(selectedAgent);
 		ticketIssue.setTicketIssueDetail(ticketIssueDetails);
+		ticketIssue.setStatus("0");//no tax invoice yet
 		ticketIssueService.insertTicketIssue(ticketIssue);
 		return "TicketIssueListScreen?faces-redirect=true";
 	}

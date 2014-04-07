@@ -3,6 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
         xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:c="http://java.sun.com/jsp/jstl/core"
         xmlns:h="http://java.sun.com/jsf/html"
         xmlns:f="http://java.sun.com/jsf/core"
         xmlns:p="http://primefaces.org/ui"
@@ -22,25 +23,44 @@
 				</f:facet>
 				
 				<h:outputLabel for="issueDate" value="Issue Date" />
-				<p:calendar id="issueDate" value="#{ticketIssueBean.issueDate}" showOn="button" />
+				<h:panelGroup>
+					<p:calendar id="issueDate" value="#{ticketIssueBean.issueDate}" showOn="button" rendered="#{ticketIssueBean.screenMode!='1'}" />
+					<h:outputText value="#{ticketIssueBean.issueDate}" rendered="#{ticketIssueBean.screenMode=='1'}">
+		            	<f:convertDateTime pattern="dd/MM/yyyy" />
+		            </h:outputText>
+				</h:panelGroup>
 				
 				<h:outputLabel for="roe" value="ROE" />
-				<pe:inputNumber id="roe" value="#{ticketIssueBean.roe}" label="ROE" />
+				<h:panelGroup>
+					<pe:inputNumber id="roe" value="#{ticketIssueBean.roe}" label="ROE" rendered="#{ticketIssueBean.screenMode!='1'}" />
+					<h:outputText value="#{ticketIssueBean.roe}" rendered="#{ticketIssueBean.screenMode=='1'}">
+		            	<f:convertNumber pattern="#,###,##0.00" />
+		            </h:outputText>
+				</h:panelGroup>
 				
 				<h:outputLabel for="paymentType" value="Payment type" />
-				<p:selectOneRadio id="paymentType" value="#{ticketIssueBean.paymentType}">
-					<f:selectItem itemLabel="Cash base" itemValue="0" />
-					<f:selectItem itemLabel="Credit card" itemValue="1" />
-					<f:selectItem itemLabel="Bank transfer" itemValue="2" />
-					<f:selectItem itemLabel="Account receivable" itemValue="3" />
-				</p:selectOneRadio>
+				<h:panelGroup>
+					<p:selectOneRadio id="paymentType" value="#{ticketIssueBean.paymentType}" rendered="#{ticketIssueBean.screenMode!='1'}">
+						<f:selectItem itemLabel="Cash base" itemValue="0" />
+						<f:selectItem itemLabel="Credit card" itemValue="1" />
+						<f:selectItem itemLabel="Bank transfer" itemValue="2" />
+						<f:selectItem itemLabel="Account receivable" itemValue="3" />
+					</p:selectOneRadio>
+					<h:outputText value="Cash base" rendered="#{ticketIssueBean.screenMode=='1' and ticketIssueBean.paymentType=='0'}" />
+					<h:outputText value="Credit card" rendered="#{ticketIssueBean.screenMode=='1' and ticketIssueBean.paymentType=='1'}" />
+					<h:outputText value="Bank transfer" rendered="#{ticketIssueBean.screenMode=='1' and ticketIssueBean.paymentType=='2'}" />
+					<h:outputText value="Account receivable" rendered="#{ticketIssueBean.screenMode=='1' and ticketIssueBean.paymentType=='3'}" />
+				</h:panelGroup>
+				
+				
 				
 				<h:outputLabel for="agent" value="Agent" />
 				<h:panelGroup>
-					<p:inputText id="agent" value="#{ticketIssueBean.displayAgentName}" label="Agent" readonly="true" />
-					<p:commandButton icon="ui-icon-extlink" actionListener="#{ticketIssueBean.chooseAgent}">
+					<p:inputText id="agent" value="#{ticketIssueBean.displayAgentName}" label="Agent" readonly="true" rendered="#{ticketIssueBean.screenMode!='1'}" />
+					<p:commandButton icon="ui-icon-extlink" actionListener="#{ticketIssueBean.chooseAgent}" rendered="#{ticketIssueBean.screenMode!='1'}">
 						<p:ajax event="dialogReturn" listener="#{ticketIssueBean.onAgentChosen}" update="agent" />
 					</p:commandButton>
+					<h:outputText value="#{ticketIssueBean.displayAgentName}" rendered="#{ticketIssueBean.screenMode=='1'}" />
 				</h:panelGroup>
 				
 				<h:outputLabel value="Input SD" />
@@ -48,7 +68,7 @@
 				
 			</p:panelGrid>
 			
-			<p:panelGrid columns="2" style="width:100%; margin-top:10px;">
+			<p:panelGrid columns="2" style="width:100%; margin-top:10px;" rendered="#{ticketIssueBean.screenMode=='1' or ticketIssueBean.screenMode=='2'}">
 				<f:facet name="header">
 					#{message.ticketIssue_addition_header}
 				</f:facet>
@@ -99,9 +119,11 @@
 		        	</p:row>
 		        </p:columnGroup>
 		        
+		        <c:if test="#{ticketIssueBean.screenMode!='1'}">
 		        <f:facet name="footer">
 		        	<p:commandButton value="Edit" icon="ui-icon-document" action="#{ticketIssueBean.gotoEditDetailScreen}" ajax="false" />
 		        </f:facet>
+		        </c:if>
 
 			</p:dataTable>
 			<p:toolbar style="margin-top:10px;">

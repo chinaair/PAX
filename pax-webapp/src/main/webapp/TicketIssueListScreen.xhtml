@@ -53,7 +53,7 @@
 				</table>
 			</p:panel>
 			<p:dataTable var="detail" value="#{ticketIssueBean.ticketIssueList}" rowKey="#{detail.id}" style="margin-top:10px"
-                selection="#{ticketIssueBean.selectedTicketIssue}" selectionMode="single">
+                selection="#{ticketIssueBean.selectedTicketIssue}" selectionMode="single" stickyHeader="true">
 				<f:facet name="header">
 		           #{message.ticketIssue_list_header}
 		        </f:facet>
@@ -72,11 +72,15 @@
 		        </p:column>
 		        
 		        <p:column headerText="Amount USD">
-		            Amount USD
+		            <h:outputText value="#{detail.amount_usd}">
+		            	<f:convertNumber pattern="#,###,##0.00" />
+		            </h:outputText>
 		        </p:column>
 		        
 		        <p:column headerText="Status">
-		            Status
+		            <h:outputText rendered="#{detail.status=='0'}" value="No tax invoice"/>
+		            <h:outputText rendered="#{detail.status=='1'}" value="Has tax invoice"/>
+		            <h:outputText rendered="#{detail.status=='2'}" value="Voided"/>
 		        </p:column>
 		        
 			</p:dataTable>
