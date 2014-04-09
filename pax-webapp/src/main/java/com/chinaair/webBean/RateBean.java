@@ -1,173 +1,121 @@
 package com.chinaair.webBean;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.ResourceBundle;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.EJB;
-import javax.enterprise.context.SessionScoped;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import javax.faces.event.ValueChangeEvent;
+import javax.enterprise.context.Conversation;
+import javax.enterprise.context.ConversationScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.primefaces.event.SelectEvent;
-
 import com.chinaair.entity.Rate;
-import com.chinaair.services.CommonUtils;
 import com.chinaair.services.RateServiceBean;
+import com.chinaair.util.DateUtil;
+import com.chinaair.util.JSFUtil;
 
-@SessionScoped
+@ConversationScoped
 @Named
 public class RateBean implements Serializable {
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	@EJB
 	private RateServiceBean rateService;
 	
-	private String localeCode;
-	
-	private static Map<String,Object> countries;
-	
 	private List<Rate> rateInfoList;
 	
-	private Rate selectedRateInfo;
+	private Rate currentRateInfo;
 	
-	private Rate rateInfo;
+	private Date searchStartDate;
 	
-	private boolean isSelectRow = false;
+	private Date searchEndDate;
+	
+	private Date rateDate;
+	
+	private BigDecimal rateAmount;
+	
+	private ResourceBundle bundle;
+	
+	@Inject
+	private Conversation conversation;
+	
+	public void startConversation() {
+		if(conversation.isTransient()) {
+			conversation.begin();
+		}
+	}
 
-	private Date searchDate;
-	
+	@PostConstruct
 	public void init() {
-		countries = new LinkedHashMap<String,Object>();
-		countries.put("English", Locale.ENGLISH); //label, value
-		countries.put("Vietnamese", new Locale("vi"));
-		rateInfoList = new ArrayList<Rate>();
-		rateInfoList = rateService.getRateList();
-		rateInfo = new Rate();
-		loadRateList();
+		bundle = ResourceBundle.getBundle("com.chinaair.internationalization.AllResourceBundle");
+		initInputRateScreen();
 	}
 	
-	public void loadRateList(){
-		rateInfoList = new ArrayList<Rate>();
-		rateInfoList = rateService.getRateList();
-		rateInfo = null;
+	public String initInputRateScreen() {
+		currentRateInfo = rateService.getTodayRate();
+		if(currentRateInfo != null) {
+			rateDate = currentRateInfo.getDatetime();
+			rateAmount = currentRateInfo.getRate();
+		} else {
+			rateDate = new Date();
+			rateAmount = null;
+		}
+		return "InputRate?faces-redirect=true";
 	}
 	
-	public String insert(){
-		if(selectedRateInfo!=null){
-			List<Rate> list = rateService.getRateByDatetime(selectedRateInfo.getDatetime());
-			if(list == null || list.isEmpty()) {
-				Rate rate = new Rate();
-				rate.setDatetime(selectedRateInfo.getDatetime());
-				rate.setRate(selectedRateInfo.getRate());
-				rateService.insert(rate);
-				loadRateList();
-				setSelectRow(false);
-				selectedRateInfo = new Rate();
-			} else{
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Insert Rate", "Đã tồn tại ngày tỷ giá"));  
-			}
+	public String initRateListScreen() {
+		Date searchDate = new Date();
+		searchStartDate = DateUtil.getFirstDateOfMonth(searchDate);
+		searchEndDate = DateUtil.getLastDateOfMonth(searchDate);
+		rateInfoList = rateService.getRateList(searchStartDate, searchEndDate);
+		return "RateList?faces-redirect=true";
+	}
+	
+	public void update(){
+		if(rateAmount == null || rateAmount.intValue() <= 0) {
+			JSFUtil.addError(bundle, ":frm:rate", "inputRate_invalidRate");
+			return;
 		}
-		return  "";
-	}
-	public String update(){
-		if(selectedRateInfo!=null){
-			rateService.update(selectedRateInfo);
-			loadRateList();
-			setSelectRow(false);
-			selectedRateInfo = new Rate();
+		if(currentRateInfo != null) {
+			currentRateInfo.setRate(rateAmount);
+			rateService.update(currentRateInfo);
+		} else {
+			Rate newRate = new Rate();
+			newRate.setDatetime(rateDate);
+			newRate.setRate(rateAmount);
+			currentRateInfo = rateService.insert(newRate);
 		}
-		return  "";
+		JSFUtil.addInfo(bundle, null, "inputRate_updateSuccessfully");
 	}
-	public String delete(){
-		if(selectedRateInfo!=null){
-			rateService.delete(selectedRateInfo);
-			loadRateList();	
-			setSelectRow(false);
-			selectedRateInfo = new Rate();
+	
+	public void delete(){
+		if(currentRateInfo!=null){
+			rateService.delete(currentRateInfo);
+			currentRateInfo = null;
+			rateDate = new Date();
+			rateAmount = null;
 		}
-		return  "";
 	}
-	public String find(){
-		if(selectedRateInfo!=null && selectedRateInfo.getDatetime()!=null){
-			rateInfoList = new ArrayList<Rate>();
-			rateInfoList = rateService.getRateByDatetime(selectedRateInfo.getDatetime());
-			if(rateInfoList != null && !rateInfoList.isEmpty()){
-				selectedRateInfo = new Rate();
-				rateInfo = null;
-				setSelectRow(false);
-			}else{
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Find Rate", "Chưa có tỷ giá ngày được chọn! "));
-			}
-			
-		} else{
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Find Rate", "Vui lòng chọn ngày cần tìm! "));
+	public void find(){
+		if(searchStartDate == null) {
+			JSFUtil.addError(bundle, ":frm:searhStart", "inputRate_invalidSearchStartDate");
+			return;
+		} else if(searchEndDate != null && searchEndDate.compareTo(searchStartDate) <= 0) {
+			JSFUtil.addError(bundle, ":frm:searhEnd", "inputRate_invalidSearchEndDate");
+			return;
 		}
-		return  "";
-	}
-	public void clear(){
-		selectedRateInfo = new Rate();
-		loadRateList();	
-		setSelectRow(false);
-		rateInfo = null;
-	}
-	public void onRowSelect(SelectEvent event) {  
-		selectedRateInfo = rateInfo;
-		setSelectRow(true);
-    }  
-	private boolean checkError(){
-		boolean error1 = CommonUtils.isThisDateValid(rateInfo.getDatetime().toString(), "dd/mm/yyyy");
-		return error1;
+		rateInfoList = rateService.getRateList(searchStartDate, searchEndDate);
 	}
 	
 	@PreDestroy
 	public void destroy() {
 		
-	}
-	
-	public Map<String, Object> getCountriesInMap() {
-		return countries;
-	}
-
-	
-	public String moveToCreateCustPage() {
-		return "createCustomer?faces-redirect=true";
-	}
-	
-	public void countryLocaleCodeChanged(ValueChangeEvent e) {
-		String newLocaleValue = e.getNewValue().toString();
-
-		// loop country map to compare the locale code
-		for (Map.Entry<String, Object> entry : countries.entrySet()) {
-
-			if (entry.getValue().toString().equals(newLocaleValue)) {
-
-				FacesContext.getCurrentInstance().getViewRoot()
-						.setLocale((Locale) entry.getValue());
-
-			}
-		}
-	}
-	
-	public String getLocaleCode() {
-	
-		return localeCode;
-	}
- 
- 
-	public void setLocaleCode(String localeCode) {
-		this.localeCode = localeCode;
 	}
 	
 	public List<Rate> getRateInfoList() {
@@ -178,37 +126,36 @@ public class RateBean implements Serializable {
 		this.rateInfoList = RateInfoList;
 	}
 
-	public Rate getSelectedRateInfo() {
-		return selectedRateInfo;
+	public Date getSearchStartDate() {
+		return searchStartDate;
 	}
 
-	public void setSelectedRateInfo(Rate selectedRateInfo) {
-		this.selectedRateInfo = selectedRateInfo;
+	public void setSearchStartDate(Date searchStartDate) {
+		this.searchStartDate = searchStartDate;
 	}
 
-	public Rate getRateInfo() {
-		return rateInfo;
+	public Date getSearchEndDate() {
+		return searchEndDate;
 	}
 
-	public void setRateInfo(Rate rateInfo) {
-		this.rateInfo = rateInfo;
-		
+	public void setSearchEndDate(Date searchEndDate) {
+		this.searchEndDate = searchEndDate;
 	}
 
-	public boolean isSelectRow() {
-		return isSelectRow;
+	public Date getRateDate() {
+		return rateDate;
 	}
 
-	public void setSelectRow(boolean isSelectRow) {
-		this.isSelectRow = isSelectRow;
+	public void setRateDate(Date rateDate) {
+		this.rateDate = rateDate;
 	}
 
-	public Date getSearchDate() {
-		return searchDate;
+	public BigDecimal getRateAmount() {
+		return rateAmount;
 	}
 
-	public void setSearchDate(Date searchDate) {
-		this.searchDate = searchDate;
+	public void setRateAmount(BigDecimal rateAmount) {
+		this.rateAmount = rateAmount;
 	}
 
 }

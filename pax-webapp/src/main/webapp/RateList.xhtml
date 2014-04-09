@@ -8,69 +8,37 @@
         xmlns:p="http://primefaces.org/ui"
         template="pageWithMenu.xhtml">
 	<ui:define name="content">
-		<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="#{message.home_header}" /></h1>
+		<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="Exchange rate" /></h1>
 		<h:panelGroup styleClass="entry" layout="block" style="margin-top:20px;margin-bottom:20px">
-		 	<p:messages id="messages" showDetail="false" autoUpdate="true" closable="false" /> 
-			<p:panelGrid columns="2" style="width:100%" id="display"> 
-				<f:event type="preRenderView" listener="#{rateBean.init}" />
-				<f:facet name="header">  
-		           Exchange Rate
-		        </f:facet> 
-			    <h:outputLabel for="popupButtonCal" value="Datetime: *" style="width:5%" />  
-			  	<p:calendar value="#{rateBean.selectedRateInfo.datetime}" id="popupButtonCal" 
-			  				required="true" label="Date time"  showOn="button" style="width:50%"
-			  				 disabled="#{rateBean.selectRow}"/>  
-			  
-			  	 
-			    <h:outputLabel for="rate" value="Rate *" style="width:5%"/>  
-			    <p:inputText id="rate" value="#{rateBean.selectedRateInfo.rate}" maxlength="10" required="true" label="Rate" style="width:50%">
-			    	<f:converter converterId="javax.faces.Double" />
-			    </p:inputText>  
-			    
-			    
-			    <f:facet name="footer">  
-				    <p:commandButton value="#{message.rate_b_add}" actionListener="#{rateBean.insert}" id="i_insert"  update=":frm:display :frm:popupButtonCal :frm:rate"
-	           			 icon="ui-icon-document" ajax="false" disabled="#{rateBean.selectRow}" /> 
-	           		<p:commandButton value="#{message.rate_b_update}" actionListener="#{rateBean.update}" id="i_update"   update=":frm:display :frm:popupButtonCal :frm:rate"
-	           			 icon="ui-icon-disk" ajax="false" disabled="#{!rateBean.selectRow}" />
-	           	 	<p:commandButton value="#{message.rate_b_del}" actionListener="#{rateBean.delete}" id="i_delete"   update=":frm:display :frm:popupButtonCal :frm:rate"
-	           			 icon="ui-icon-close"  ajax="false" disabled="#{!rateBean.selectRow}" />
-	           		<p:commandButton value="#{message.rate_b_clear}" actionListener="#{rateBean.clear}" id="i_clear"   update=":frm:display :frm:popupButtonCal :frm:rate"
-	           			icon="ui-icon-refresh"  ajax="false" immediate="true" />
-			    </f:facet>  
-			</p:panelGrid>  
-		</h:panelGroup>
-		 <p:fragment autoUpdate="true">  
-				<h:panelGroup styleClass="entry" layout="block">
-            		<p:calendar value="#{rateBean.selectedRateInfo.datetime}" id="searchDate" 
-			  				label="Date time"  showOn="button" style="width:50%"/>
-			  		<p:commandButton value="#{message.rate_b_find}" actionListener="#{rateBean.find}" id="i_find"   update=":frm:display :frm:popupButtonCal :frm:rate"
-	           			icon="ui-icon-search"  ajax="true"  immediate="false" />
-           		 </h:panelGroup>
-		 </p:fragment>
-		
-		<h:panelGroup styleClass="entry" layout="block">
-			<p:dataTable value="#{rateBean.rateInfoList}" var="rate"
-				rowKey="#{rate.id}" selection="#{rateBean.rateInfo}"
-				paginator="true" rows="10"
-				selectionMode="single">
-  			<p:ajax event="rowSelect" listener="#{rateBean.onRowSelect}"   
-                    update=":frm:display" />  
-            
-	        <f:facet name="header">  
-	           Exchange Rate List
-	        </f:facet>  
-	  		
-	        <p:column headerText="Datetime">  
-	           <h:outputText value="#{rate.datetime}"> <f:convertDateTime pattern="dd/MM/yyyy"/></h:outputText>
-	        </p:column>  
-	  
-	        <p:column headerText="Rate">  
-	             <h:outputText value="#{rate.rate}" ><f:convertNumber pattern="###,###,###"></f:convertNumber></h:outputText>
-	        </p:column>  
-	  
-    </p:dataTable>  
-    
+		 	<p:messages id="messages" showDetail="false" autoUpdate="true" closable="false" />
+		 	<p:tabMenu activeIndex="1">
+				<p:menuitem value="Input rate" action="#{rateBean.initInputRateScreen}" icon="ui-icon-star" immediate="true"/>
+		    	<p:menuitem value="List" action="#{rateBean.initRateListScreen}" icon="ui-icon-search" immediate="true" />
+			</p:tabMenu>
+			
+			<p:panel header="Search condition" toggleable="true" toggleSpeed="500" closeSpeed="500" widgetVar="panel" collapsed="true" style="margin-top:10px">
+				<table border="0" cellspacing="0" cellpadding="0" width="100%">
+					<tr>
+						<td><p:outputLabel for="searhStart" value="Start date:" /></td>
+						<td><p:calendar id="searhStart" value="#{rateBean.searchStartDate}" showOn="button" /></td>
+						<td><p:outputLabel for="searhEnd" value="End date:" /></td>
+						<td><p:calendar id="searhEnd" value="#{rateBean.searchEndDate}" showOn="button" /></td>
+						<td><p:commandButton value="Search" icon="ui-icon-document" actionListener="#{rateBean.find}" ajax="false" /></td>
+					</tr>
+				</table>
+			</p:panel>
+			
+		 	<p:dataTable value="#{rateBean.rateInfoList}" var="rate" style="margin-top:10px"
+				paginator="true" rows="10">
+				
+		        <p:column headerText="Datetime">
+		           <h:outputText value="#{rate.datetime}"> <f:convertDateTime pattern="dd/MM/yyyy"/></h:outputText>
+		        </p:column>
+		  
+		        <p:column headerText="Rate">
+		             <h:outputText value="#{rate.rate}" ><f:convertNumber pattern="###,###,###"></f:convertNumber></h:outputText>
+		        </p:column>
+	    	</p:dataTable>
 		</h:panelGroup>
 	</ui:define>
 </ui:composition>

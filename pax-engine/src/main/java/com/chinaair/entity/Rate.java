@@ -1,8 +1,6 @@
 package com.chinaair.entity;
 
-
-
-
+import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -27,7 +25,7 @@ public class Rate {
 	private Date datetime;
 	
 	@Column(name="RATE", nullable = false)
-	private Double rate;
+	private BigDecimal rate;
 	
 	public Long getId() {
 		return id;
@@ -45,11 +43,11 @@ public class Rate {
 		this.datetime = datetime;
 	}
 
-	public Double getRate() {
+	public BigDecimal getRate() {
 		return rate;
 	}
 
-	public void setRate(Double rate) {
+	public void setRate(BigDecimal rate) {
 		this.rate = rate;
 	}
 
