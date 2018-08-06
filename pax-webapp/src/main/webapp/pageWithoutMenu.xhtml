@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+xmlns:h="http://java.sun.com/jsf/html"
+xmlns:f="http://java.sun.com/jsf/core"
+xmlns:ui="http://java.sun.com/jsf/facelets"
+xmlns:p="http://primefaces.org/ui"
+xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<f:view contentType="text/html" locale="#{loginBean.language}">
+<h:head>
+		<f:facet name="first">
+			<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+			<meta content='text/html; charset=UTF-8' http-equiv="Content-Type" />
+			<title>#{loginBean.systemClass == 'AE' ? message.main_title_page_ae : message.main_title_page_ci}</title>
+			<link rel="shortcut icon" type="image/png" href="#{request.contextPath}/images/#{loginBean.systemClass == 'AE' ? 'logo_ae.png' : 'logo.png'}" />
+		</f:facet>
+		<link type="text/css" rel="stylesheet" href="#{request.contextPath}/css/default.css" />
+	</h:head>
+
+<h:body>
+	<h:form id="frm">
+	<h:panelGroup styleClass="#{loginBean.systemClass == 'AE' ? 'mandarinAirlinesBG' : 'chinaAirlinesBG'}" layout="block"/>
+	<h:panelGroup styleClass="header ui-widget ui-widget-header" layout="block">
+		<h:panelGroup styleClass="leftlogo" layout="block">
+			<a href="#{request.contextPath}/ui/Home.xhtml">
+				<img src="#{request.contextPath}/images/#{loginBean.systemClass == 'AE' ? 'banner_ae.png' : 'banner.png'}" alt="Banner"/>
+			</a>
+		</h:panelGroup>
+		<h:panelGroup styleClass="centrallogo" layout="block">
+			<img src="#{request.contextPath}/images/#{loginBean.systemClass == 'AE' ? 'aepaxCooltext.png' : 'cipaxCooltext.png'}" alt="cipax"/>
+		</h:panelGroup>
+		<h:panelGroup styleClass="menu ui-widget" layout="block">
+				<c:if test="#{loginBean != null and loginBean.loginUser != null}">
+					<p:commandLink style="margin-right:20px;">
+						<p:graphicImage value="/images/user.png" style="vertical-align:middle;" />
+						<h:outputText value="#{loginBean.loginUser.empName}" style="vertical-align:middle;margin-left:2px;" />
+					</p:commandLink>
+					<p:commandLink id="logout" immediate="true" action="#{loginBean.logout}" style="margin-right:20px;" ajax="false" onclick="PF('statusDialog').show();">
+						<p:graphicImage value="/images/logout.png" style="vertical-align:middle;" />
+						<h:outputText value="#{message.login_btnLogout}" style="vertical-align:middle;margin-left:2px;" />
+				    </p:commandLink>
+				    <p:commandLink id="system" immediate="true" action="#{loginBean.doSystem}" style="margin-right:20px;" ajax="false" onclick="PF('statusDialog').show();">
+						<p:graphicImage value="/images/applications_system.png" style="vertical-align:middle;" />
+						<h:outputText value="#{message.login_btnSystem}" style="vertical-align:middle;margin-left:2px;" />
+				    </p:commandLink>
+				</c:if>
+				<c:if test="#{loginBean == null or loginBean.loginUser == null}">
+					<p:commandLink id="system" immediate="true" action="#{loginBean.doLogin}" style="margin-right:20px;" ajax="false" onclick="PF('statusDialog').show();">
+						<p:graphicImage value="/images/key.png" style="vertical-align:middle;" />
+						<h:outputText value="#{message.login_btnLogin}" style="vertical-align:middle;margin-left:2px;" />
+				    </p:commandLink>
+				</c:if>
+		</h:panelGroup>
+	</h:panelGroup>
+	
+	<h:panelGroup styleClass="page ui-widget" layout="block">
+		<p:ajaxStatus onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide();"/>
+		<p:dialog modal="true" widgetVar="statusDialog" header="Please wait ..."
+		        draggable="false" closable="false">
+		    <p:graphicImage value="/images/ajaxloadingbar.gif" />
+		</p:dialog>
+		
+		<h:panelGroup styleClass="post" layout="block">
+			<ui:insert name="content">...</ui:insert>
+		</h:panelGroup>
+	</h:panelGroup>
+</h:form>
+</h:body>
+
+</f:view>
+</html>

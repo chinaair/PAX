@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:pe="http://primefaces.org/ui/extensions"
+        template="pageWithMenu.xhtml">
+	<ui:define name="content">
+		<f:event type="preRenderView" listener="#{employeeBean.startConversation}" />
+		<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="#{message.employee_header}" /></h1>
+		<h:panelGroup styleClass="entry" layout="block">
+			<p:messages id="messages" showDetail="false" autoUpdate="true" closable="false" />
+			<p:toolbar>
+				<p:toolbarGroup align="left">
+					<p:commandButton value="#{message.employee_new}" icon="ui-icon-plus" action="#{employeeBean.gotoNewEmployeeScreen}" ajax="false" />
+					<p:commandButton value="#{message.employee_view}" icon="ui-icon-document" action="#{employeeBean.gotoViewEmployeeScreen}" ajax="false" />
+					<p:commandButton value="#{message.employee_print}" icon="ui-icon-print" action="#{employeeBean.printEmployeeInfo}" ajax="false" />
+				</p:toolbarGroup>
+			</p:toolbar>
+			
+			<p:panel header="#{message.employee_header_search}" toggleable="true" toggleSpeed="500" closeSpeed="500" widgetVar="panel" collapsed="true" style="margin-top:10px">
+				<table border="0" cellspacing="0" cellpadding="0" width="100%">
+					<tr>
+						<td><p:outputLabel for="employeeName" value="#{message.employee_employeeName} : " /></td>
+						<td><p:inputText value="#{employeeBean.searchEmpName}" id="employeeName" label="#{message.employee_employeeName}"/></td>
+						<td><p:outputLabel for="userId" value="#{message.employee_userId} : " /></td>
+						<td><p:inputText value="#{employeeBean.searchUserId}" id="userId" label="#{message.employee_userId}"/></td>
+					<td><p:commandButton value="#{message.employee_bt_search}" icon="ui-icon-document" actionListener="#{employeeBean.searchEmployee}" ajax="false" /></td>
+					</tr>
+				</table>
+			</p:panel>
+			<p:dataTable value="#{employeeBean.employeeList}" var="employee" style="margin-top:10px"
+		 		rowKey="#{employee.id}"
+				paginator="true" rows="10" selection="#{employeeBean.selectedEmployee}" selectionMode="single">
+				
+				 <p:ajax event="rowSelect" listener="#{employeeBean.gotoViewEmployeeScreen}"/>  
+       			
+				<f:facet name="header">
+		           #{message.employee_list_header}
+		        </f:facet>
+		  
+		        <p:column headerText="#{message.employee_employeeName}">
+		             <h:outputText value="#{employee.empName}" ></h:outputText>
+		        </p:column>
+		        
+		        <p:column headerText="#{message.employee_userId}">
+		             <h:outputText value="#{employee.userId}" ></h:outputText>
+		        </p:column>
+		        
+		        <p:column headerText="#{message.employee_password}">
+		             <h:outputText value="#{employee.password}" ></h:outputText>
+		        </p:column>
+		        
+		        
+		        <p:column headerText="#{message.employee_position}">
+		             <h:outputText value="#{employee.position}" ></h:outputText>
+		        </p:column>
+		        
+		        <p:column headerText="#{message.employee_taxCode}">
+		             <h:outputText value="#{employee.taxCode}" ></h:outputText>
+		        </p:column>
+		        
+	    	</p:dataTable>
+			
+			<p:toolbar style="margin-top:10px;">
+				<p:toolbarGroup align="left">
+					<p:commandButton value="#{message.employee_new}" icon="ui-icon-plus" action="#{employeeBean.gotoNewEmployeeScreen}" ajax="false" />
+					<p:commandButton value="#{message.employee_view}" icon="ui-icon-document" action="#{employeeBean.gotoViewEmployeeScreen}" ajax="false" />
+					<p:commandButton value="#{message.employee_print}" icon="ui-icon-print" action="#{employeeBean.printEmployeeInfo}" ajax="false" />
+				</p:toolbarGroup>
+			</p:toolbar>
+		</h:panelGroup>
+			
+	</ui:define>
+</ui:composition>

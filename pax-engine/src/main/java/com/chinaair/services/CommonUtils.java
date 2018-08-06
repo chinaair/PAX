@@ -2,15 +2,9 @@ package com.chinaair.services;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
-import com.chinaair.entity.Customer;
 
 @Stateless
 @LocalBean
@@ -28,7 +22,7 @@ public class CommonUtils {
 		try {
  
 			//if not valid, it will throw ParseException
-			Date date = sdf.parse(dateToValidate);
+			sdf.parse(dateToValidate);
  
 		} catch (ParseException e) {
 			return false;

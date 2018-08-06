@@ -15,9 +15,6 @@ import javax.persistence.TemporalType;
 @Entity
 public class Agent implements Serializable {
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 3604228958713114645L;
 
 	@Id
@@ -25,7 +22,7 @@ public class Agent implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@Column(name="CODE", unique = true, nullable = false)
+	@Column(name="CODE", nullable = false)
 	private String code;
 	
 	/**
@@ -76,6 +73,13 @@ public class Agent implements Serializable {
 	@Column(name="VALID_DATE")
 	@Temporal(TemporalType.DATE)
 	private Date valid_date;
+	
+	/**
+	 * 1: passenger
+	 * null/0: customer
+	 */
+	@Column(name="RETAILFLAG")
+	private String retailFlag;
 
 	public Long getId() {
 		return id;
@@ -187,6 +191,14 @@ public class Agent implements Serializable {
 
 	public void setValid_date(Date valid_date) {
 		this.valid_date = valid_date;
+	}
+
+	public String getRetailFlag() {
+		return retailFlag;
+	}
+
+	public void setRetailFlag(String retailFlag) {
+		this.retailFlag = retailFlag;
 	}
 
 }

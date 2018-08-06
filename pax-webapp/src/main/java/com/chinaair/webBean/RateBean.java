@@ -3,7 +3,6 @@ package com.chinaair.webBean;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.annotation.PostConstruct;
@@ -14,13 +13,16 @@ import javax.enterprise.context.ConversationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.primefaces.model.LazyDataModel;
+
 import com.chinaair.entity.Rate;
 import com.chinaair.services.RateServiceBean;
 import com.chinaair.util.DateUtil;
 import com.chinaair.util.JSFUtil;
+import com.chinaair.webDto.RateModel;
 
 @ConversationScoped
-@Named
+@Named("rateBean")
 public class RateBean implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
@@ -28,8 +30,7 @@ public class RateBean implements Serializable {
 	@EJB
 	private RateServiceBean rateService;
 	
-	private List<Rate> rateInfoList;
-	
+	private LazyDataModel<Rate> rateInfoList;
 	private Rate currentRateInfo;
 	
 	private Date searchStartDate;
@@ -45,6 +46,9 @@ public class RateBean implements Serializable {
 	@Inject
 	private Conversation conversation;
 	
+	/**
+	 * start conversation cho man hinh
+	 */
 	public void startConversation() {
 		if(conversation.isTransient()) {
 			conversation.begin();
@@ -73,13 +77,13 @@ public class RateBean implements Serializable {
 		Date searchDate = new Date();
 		searchStartDate = DateUtil.getFirstDateOfMonth(searchDate);
 		searchEndDate = DateUtil.getLastDateOfMonth(searchDate);
-		rateInfoList = rateService.getRateList(searchStartDate, searchEndDate);
+		rateInfoList = new RateModel(rateService,null,null);
 		return "RateList?faces-redirect=true";
 	}
 	
 	public void update(){
 		if(rateAmount == null || rateAmount.intValue() <= 0) {
-			JSFUtil.addError(bundle, ":frm:rate", "inputRate_invalidRate");
+			JSFUtil.addError(bundle, null, ":frm:rate", "inputRate_invalidRate");
 			return;
 		}
 		if(currentRateInfo != null) {
@@ -91,7 +95,7 @@ public class RateBean implements Serializable {
 			newRate.setRate(rateAmount);
 			currentRateInfo = rateService.insert(newRate);
 		}
-		JSFUtil.addInfo(bundle, null, "inputRate_updateSuccessfully");
+		JSFUtil.addInfo(bundle, null, null, "inputRate_updateSuccessfully");
 	}
 	
 	public void delete(){
@@ -104,13 +108,13 @@ public class RateBean implements Serializable {
 	}
 	public void find(){
 		if(searchStartDate == null) {
-			JSFUtil.addError(bundle, ":frm:searhStart", "inputRate_invalidSearchStartDate");
+			JSFUtil.addError(bundle, null, ":frm:searhStart", "inputRate_invalidSearchStartDate");
 			return;
 		} else if(searchEndDate != null && searchEndDate.compareTo(searchStartDate) <= 0) {
-			JSFUtil.addError(bundle, ":frm:searhEnd", "inputRate_invalidSearchEndDate");
+			JSFUtil.addError(bundle, null, ":frm:searhEnd", "inputRate_invalidSearchEndDate");
 			return;
 		}
-		rateInfoList = rateService.getRateList(searchStartDate, searchEndDate);
+		rateInfoList = new RateModel(rateService,searchStartDate,searchEndDate);
 	}
 	
 	@PreDestroy
@@ -118,14 +122,6 @@ public class RateBean implements Serializable {
 		
 	}
 	
-	public List<Rate> getRateInfoList() {
-		return rateInfoList;
-	}
-
-	public void setRateInfoList(List<Rate> RateInfoList) {
-		this.rateInfoList = RateInfoList;
-	}
-
 	public Date getSearchStartDate() {
 		return searchStartDate;
 	}
@@ -156,6 +152,14 @@ public class RateBean implements Serializable {
 
 	public void setRateAmount(BigDecimal rateAmount) {
 		this.rateAmount = rateAmount;
+	}
+
+	public LazyDataModel<Rate> getRateInfoList() {
+		return rateInfoList;
+	}
+
+	public void setRateInfoList(LazyDataModel<Rate> rateInfoList) {
+		this.rateInfoList = rateInfoList;
 	}
 
 }

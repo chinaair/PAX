@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:pe="http://primefaces.org/ui/extensions"
+        template="pageWithMenu.xhtml">
+	<ui:define name="content">
+		<f:event type="preRenderView" listener="#{finalReportBean.startConversation}" />
+		<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="FINAL REPORT TO AGENT" /></h1>
+		<h:panelGroup styleClass="entry" layout="block">
+			<p:messages id="messages" showDetail="false" autoUpdate="true" closable="false" />
+			<p:toolbar>
+				<p:toolbarGroup align="left">
+					<p:commandButton value="Print" icon="ui-icon-document" action="#{finalReportBean.finalReportPrint}" ajax="false" />
+					<p:commandButton value="Export" icon="ui-icon-document" action="#{finalReportBean.finalReportExport}" ajax="false" />
+				</p:toolbarGroup>
+			</p:toolbar>
+			
+			<p:panelGrid id="inputArea" columns="2" style="width:100%; margin-top:10px;">
+				<f:facet name="header">
+					Search condition
+				</f:facet>
+				
+				<h:outputLabel for="reportPeriod" value="Report period" />
+				<p:selectOneRadio id="reportPeriod" value="#{finalReportBean.reportPeriod}" >
+					<p:ajax event="change" listener="#{finalReportBean.onChangeReportPeriod}" update=":frm:reportYearMonth :frm:startDate :frm:endDate" />
+					<f:selectItem itemLabel="First period" itemValue="1" />
+					<f:selectItem itemLabel="Second peroid" itemValue="2" />
+					<f:selectItem itemLabel="Whole month" itemValue="0" />
+					<f:selectItem itemLabel="Custom period" itemValue="3" />
+				</p:selectOneRadio>
+				
+				<p:outputLabel value="Period" />
+				<h:panelGroup>
+					<h:outputText value="From date"/>&#160;
+					<p:calendar id="startDate" value="#{finalReportBean.reportStartDate}" showOn="button" disabled="#{finalReportBean.reportDateDisabled}" pattern="dd/MM/yyyy" />
+					&#160;&#160;
+					<h:outputText value="To date"/>&#160;
+					<p:calendar id="endDate" value="#{finalReportBean.reportEndDate}" showOn="button" disabled="#{finalReportBean.reportDateDisabled}" pattern="dd/MM/yyyy" />
+				</h:panelGroup>
+				
+				<p:outputLabel value="Select month" />
+				<p:inputMask id="reportYearMonth" value="#{finalReportBean.reportYearMonth}" mask="9999/99" disabled="#{finalReportBean.reportYearMonthDisabled}">
+					<p:ajax event="change" listener="#{finalReportBean.onChangeYearMonth}" update=":frm:startDate :frm:endDate" />
+				</p:inputMask>
+				
+				<p:outputLabel for="paymentType" value="Payment type" />
+				<p:selectOneRadio id="paymentType" value="#{finalReportBean.paymentType}">
+					<f:selectItem itemLabel="#{message.ticketIssue_paymentType_cash}" itemValue="0" />
+					<f:selectItem itemLabel="#{message.ticketIssue_paymentType_credit}" itemValue="1" />
+					<f:selectItem itemLabel="#{message.ticketIssue_paymentType_transfer}" itemValue="2" />
+					<f:selectItem itemLabel="#{message.ticketIssue_paymentType_account}" itemValue="3" />
+				</p:selectOneRadio>
+				
+				<f:facet name="footer">  
+				    <p:commandButton value="Search" actionListener="#{finalReportBean.searchFinalReportData}" icon="ui-icon-document" ajax="false" onclick="PF('statusDialog').show();" />
+			    </f:facet>
+			</p:panelGrid>
+			<p:dataTable var="detail" value="#{finalReportBean.agentSummaryList}" style="margin-top:10px"
+                selection="#{finalReportBean.selectAgentSumDtos}">
+				<f:facet name="header">
+		           #{message.ticketIssue_list_header}
+		        </f:facet>
+		        
+				<p:column selectionMode="multiple" style="width:20px;" />
+				
+				<p:column headerText="Agent code">
+		            #{detail.agent.code}
+		        </p:column>
+		        
+		        <p:column headerText="Agent name">
+		            #{detail.agent.name}
+		        </p:column>
+		        
+		        <p:column headerText="Amount USD">
+		            <h:outputText value="#{detail.summaryAmtUsd}">
+		            	<f:convertNumber pattern="#,##0.00" />
+		            </h:outputText>
+		        </p:column>
+		        
+			</p:dataTable>
+			
+			<p:toolbar style="margin-top:10px;">
+				<p:toolbarGroup align="left">
+					<p:commandButton value="Print" icon="ui-icon-document" action="#{finalReportBean.finalReportPrint}" ajax="false" />
+					<p:commandButton value="Export" icon="ui-icon-document" action="#{finalReportBean.finalReportExport}" ajax="false" />
+				</p:toolbarGroup>
+			</p:toolbar>
+		</h:panelGroup>
+			
+	</ui:define>
+</ui:composition>

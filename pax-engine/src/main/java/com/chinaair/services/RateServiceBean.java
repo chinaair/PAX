@@ -39,7 +39,58 @@ public class RateServiceBean {
 		}
 		return query.getResultList();
 	}
-	
+	@SuppressWarnings("unchecked")
+	public List<Rate> getRateList(int first, int pageSize) {
+		StringBuffer strbuffer = new StringBuffer(); 
+		strbuffer.append("SELECT r ")
+		         .append("FROM Rate r ");
+		strbuffer.append(" ORDER BY r.datetime DESC, r.id DESC");
+		Query query = em.createQuery(strbuffer.toString(), Rate.class);
+		query.setFirstResult(first);
+		query.setMaxResults(pageSize);
+		return query.getResultList();
+	}
+	public List<Rate> getRateList(Date startDate, Date endDate,int first, int pageSize) {
+		StringBuffer strbuffer = new StringBuffer(); 
+		strbuffer.append("SELECT r ")
+		         .append("FROM Rate r ");
+		if(startDate != null) {
+			strbuffer.append(" WHERE r.datetime >= :startDate ");
+			if(endDate != null) {
+				strbuffer.append(" AND r.datetime <= :endDate ");
+			}
+		}
+		strbuffer.append(" ORDER BY r.datetime DESC, r.id DESC");
+		Query query = em.createQuery(strbuffer.toString(), Rate.class);
+		if(startDate != null) {
+			query.setParameter("startDate", startDate);
+			if(endDate != null) {
+				query.setParameter("endDate", endDate);
+			}
+		}
+		query.setFirstResult(first);
+		query.setMaxResults(pageSize);
+		return query.getResultList();
+	}
+	public int countRateList(Date startDate,Date endDate) {
+		StringBuffer strbuffer = new StringBuffer(); 
+		strbuffer.append("SELECT r ")
+		         .append("FROM Rate r ");
+		if(startDate != null) {
+			strbuffer.append(" WHERE r.datetime >= :startDate ");
+			if(endDate != null) {
+				strbuffer.append(" AND r.datetime <= :endDate ");
+			}
+		}
+		Query query = em.createQuery(strbuffer.toString(), Rate.class);
+		if(startDate != null) {
+			query.setParameter("startDate", startDate);
+			if(endDate != null) {
+				query.setParameter("endDate", endDate);
+			}
+		}
+		return query.getResultList().size();
+	}
 	public Rate getRateById(Long id) {
 		if(id !=null){
 			Rate rate = em.find(Rate.class, id);
@@ -77,6 +128,23 @@ public class RateServiceBean {
 	public Rate getTodayRate() {
 		List<Rate> foundRate = em.createQuery("SELECT r FROM Rate r WHERE r.datetime = :today ORDER BY r.id DESC", Rate.class)
 			.setParameter("today", new Date()).getResultList();
+		if(!foundRate.isEmpty()) {
+			return foundRate.get(0);
+		}
+		return null;
+	}
+	
+	public Rate getNearestRate() {
+		List<Rate> foundRate = em.createQuery("SELECT r FROM Rate r ORDER BY r.datetime DESC, r.id DESC", Rate.class)
+				.setMaxResults(1).getResultList();
+		if(!foundRate.isEmpty()) {
+			return foundRate.get(0);
+		}
+		return null;
+	}
+	
+	public Rate getRateByDate(Date rateDate) {
+		List<Rate> foundRate = em.createQuery("SELECT r FROM Rate r WHERE r.datetime = :rateDate", Rate.class).setParameter("rateDate", rateDate).getResultList();
 		if(!foundRate.isEmpty()) {
 			return foundRate.get(0);
 		}

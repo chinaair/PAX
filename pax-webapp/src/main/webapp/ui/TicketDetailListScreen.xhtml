@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:pe="http://primefaces.org/ui/extensions"
+        template="pageWithMenu.xhtml">
+	<ui:define name="content">
+		<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="#{message.ticketIssue_header}" /></h1>
+		<h:panelGroup styleClass="entry" layout="block">
+			<p:messages id="messages" showDetail="false" autoUpdate="true" closable="false" />
+			<p:toolbar>
+				<p:toolbarGroup align="left">
+					<p:commandButton value="OK" icon="ui-icon-document" action="#{ticketIssueBean.okDetail}" ajax="false" immediate="true" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="Cancel" icon="ui-icon-document" action="#{ticketIssueBean.cancelDetail}" ajax="false" immediate="true" onclick="PF('statusDialog').show();" />
+				</p:toolbarGroup>
+			</p:toolbar>
+			<p:panelGrid id="inputArea" columns="2" style="width:100%; margin-top:10px;">
+				<f:facet name="header">
+					#{message.ticketDetail_input_header}
+				</f:facet>
+				
+				<h:outputLabel for="ticketNo" value="Ticket number" />
+				<p:inputText id="ticketNo" value="#{ticketIssueBean.inputTicketNo}" label="Ticket number" maxlength="200" required="true" />
+				
+				<h:outputLabel for="route" value="Route" />
+				<p:inputText id="route" value="#{ticketIssueBean.inputRoute}" label="Route" maxlength="1000" style="text-transform:uppercase;" />
+				
+				<h:outputLabel for="quantity" value="Quantity" />
+				<pe:inputNumber id="quantity" value="#{ticketIssueBean.inputQuantity}" label="Quantity" decimalPlaces="0" required="true" />
+				
+				<h:outputLabel for="price" value="Price" />
+				<pe:inputNumber id="price" value="#{ticketIssueBean.inputPrice}" label="Price" required="true" minValue="-999999999999.99" maxValue="999999999999.99" />
+				
+				<f:facet name="footer">  
+				    <p:commandButton value="#{message.resource_b_add}" actionListener="#{ticketIssueBean.insertDetail}" id="i_insert"   
+	           			 icon="ui-icon-document" ajax="false" onclick="PF('statusDialog').show();" /> 
+	           		<p:commandButton value="#{message.resource_b_update}" actionListener="#{ticketIssueBean.updateDetail}" id="i_update"   
+	           			 icon="ui-icon-disk" ajax="false" onclick="PF('statusDialog').show();" />
+	           	 	<p:commandButton value="#{message.resource_b_del}" actionListener="#{ticketIssueBean.deleteDetail}" id="i_delete"   
+	           			 icon="ui-icon-close"  ajax="false" immediate="true" onclick="PF('statusDialog').show();" />
+	           		<p:commandButton value="Clear" actionListener="#{ticketIssueBean.clearDetail}" id="i_clear"   
+	           			 icon="ui-icon-close"  ajax="false" immediate="true" onclick="PF('statusDialog').show();" />
+			    </f:facet>
+			</p:panelGrid>
+		</h:panelGroup>
+			
+		<h:panelGroup styleClass="entry" layout="block">
+			<p:dataTable var="detail" value="#{ticketIssueBean.inputTicketDetails}" rowKey="#{detail.ticketNo}" style="margin-top:10px"
+                selection="#{ticketIssueBean.selectedTicketIssueDetail}" selectionMode="single">
+                <p:ajax event="rowSelect" listener="#{ticketIssueBean.onSelectTicketDetail}"   
+                    update=":frm:inputArea" />
+				<f:facet name="header">
+		           #{message.ticketIssue_list_header}
+		        </f:facet>
+				<p:column headerText="#{message.ticketIssue_number}">
+		            #{detail.ticketNo}
+		        </p:column>
+		        
+		        <p:column headerText="#{message.ticketIssue_route}">
+		            #{detail.route}
+		        </p:column>
+		        
+		        <p:column headerText="#{message.ticketIssue_quantity}">
+		            <h:outputText value="#{detail.quantity}">
+		            	<f:convertNumber pattern="#,###" />
+		            </h:outputText>
+		        </p:column>
+		        
+		        <p:column headerText="#{message.ticketIssue_price}">
+		            <h:outputText value="#{detail.price}">
+		            	<f:convertNumber pattern="#,##0.00" />
+		            </h:outputText>
+		        </p:column>
+		        
+		        <p:column headerText="#{message.ticketIssue_amount}">
+		        	<h:outputText value="#{detail.amount}">
+		            	<f:convertNumber pattern="#,##0.00" />
+		            </h:outputText>
+		        </p:column>
+		        
+		        <p:columnGroup type="footer">
+		        	<p:row>
+		        		<p:column footerText="" />
+		        		<p:column colspan="2" footerText="#{message.ticketIssue_total_amt_usd}&#160;#{ticketIssueBean.displayTotalUsd}" />
+		        		<p:column colspan="2" footerText="#{message.ticketIssue_total_amt_vnd}&#160;#{ticketIssueBean.displayTotalVnd}" />
+		        	</p:row>
+		        </p:columnGroup>
+
+			</p:dataTable>
+			<p:toolbar style="margin-top:10px;">
+				<p:toolbarGroup align="left">
+					<p:commandButton value="OK" icon="ui-icon-document" action="#{ticketIssueBean.okDetail}" ajax="false" immediate="true" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="Cancel" icon="ui-icon-document" action="#{ticketIssueBean.cancelDetail}" ajax="false" immediate="true" onclick="PF('statusDialog').show();" />
+				</p:toolbarGroup>
+			</p:toolbar>
+		</h:panelGroup>
+	</ui:define>
+</ui:composition>

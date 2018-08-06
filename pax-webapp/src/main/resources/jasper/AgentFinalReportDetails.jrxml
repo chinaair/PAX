@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="TicketIssueDetails" pageWidth="555" pageHeight="842" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="141ead0c-04fe-4459-95b6-2b9968ffa5c8">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<field name="issueDate" class="java.util.Date"/>
+	<field name="dailyAmtUsd" class="java.math.BigDecimal"/>
+	<field name="dailyAmtVnd" class="java.math.BigDecimal"/>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="195" height="20" uuid="4c6ddd4a-2aa8-4a84-ba14-b219e839f9b8"/>
+				<box leftPadding="0">
+					<topPen lineWidth="0.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<text><![CDATA[ Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="375" y="0" width="180" height="20" uuid="1ff5eae7-7dfd-464f-8703-16fe4ba38b80"/>
+				<box rightPadding="2">
+					<topPen lineWidth="0.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<text><![CDATA[Amount (VND)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="195" y="0" width="180" height="20" uuid="c96a58ae-8c02-4802-8da7-58ebf1a5c0fa"/>
+				<box rightPadding="2">
+					<topPen lineWidth="0.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<text><![CDATA[Amount (USD)]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="0" y="0" width="195" height="20" uuid="ad70a718-7c9c-473e-8fdc-a7a9d6157838"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{issueDate}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="195" y="0" width="180" height="20" uuid="f125cd51-ecb4-4b66-81fe-7829e8a63458"/>
+				<box rightPadding="0"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dailyAmtUsd}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="375" y="0" width="180" height="20" uuid="9be2beaf-83cc-416f-af42-c1a7df23cd92"/>
+				<box rightPadding="0"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dailyAmtVnd}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

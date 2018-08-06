@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:c="http://java.sun.com/jsp/jstl/core"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:pe="http://primefaces.org/ui/extensions"
+        template="pageWithMenu.xhtml">
+<ui:define name="content">
+	<style type="text/css">
+		.column1{
+			width: 100px;
+		}
+		.column2{
+			width: auto;
+		}
+		.notification{
+			filter:alpha(opacity=80);
+			opacity:0.8;
+			height:20px;
+		}
+	</style>
+	<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="TAX INVOICE ISSUE" /></h1>
+	<p:notificationBar rendered="#{taxInvIssueBean.todayRateNotSet}" autoDisplay="true" effect="slide" position="top" styleClass="notification">
+		<h:outputText value="#{message.ticketIssue_warn_todayRateNotSet}" style="font-size:22px; color:red;" />
+	</p:notificationBar>
+	<h:panelGroup styleClass="entry" layout="block">
+			<p:messages id="messages" showDetail="false" autoUpdate="true" closable="true" />
+			<p:toolbar>
+				<p:toolbarGroup align="left">
+					<p:commandButton value="Create" type="button" icon="ui-icon-check" rendered="#{taxInvIssueBean.screenMode=='0' and taxInvIssueBean.todayRateNotSet}" onclick="PF('createConfirm').show()" />
+					<p:commandButton value="Create" icon="ui-icon-check" action="#{taxInvIssueBean.registerTaxInvoice}" rendered="#{taxInvIssueBean.screenMode=='0' and not taxInvIssueBean.todayRateNotSet}" ajax="false" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="Store" icon="ui-icon-disk" action="#{taxInvIssueBean.storeTaxInvoice}" rendered="#{taxInvIssueBean.screenMode=='0'}" ajax="false" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="Edit" icon="ui-icon-pencil" action="#{taxInvIssueBean.editTaxInvoice}" rendered="#{taxInvIssueBean.screenMode=='1'}" ajax="false" onclick="PF('statusDialog').show();" disabled="#{taxInvIssueBean.selectedTaxInvIssue.status == 2 or not taxInvIssueBean.hasEditAuthority}" />
+					<p:commandButton value="Update" icon="ui-icon-check" action="#{taxInvIssueBean.updateTaxInvoice}" rendered="#{taxInvIssueBean.screenMode=='2'}" ajax="false" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="Use" icon="ui-icon-check" action="#{taxInvIssueBean.useTaxInvoice}" rendered="#{taxInvIssueBean.screenMode=='2' and taxInvIssueBean.selectedTaxInvIssue.status == 3}" ajax="false" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="Void" icon="ui-icon-minus" type="button" rendered="#{taxInvIssueBean.screenMode=='1'}" disabled="#{taxInvIssueBean.selectedTaxInvIssue.status == 2 or not taxInvIssueBean.hasEditAuthority}" onclick="PF('voidConfirm').show();" />
+					<p:commandButton value="Print" icon="ui-icon-document" action="#{taxInvIssueBean.printTaxInvIssueInfo}" rendered="#{taxInvIssueBean.screenMode=='1'}" disabled="#{taxInvIssueBean.selectedTaxInvIssue.status == 2}" ajax="false" />
+					<p:commandButton value="Cancel" icon="ui-icon-arrowreturnthick-1-w" action="#{taxInvIssueBean.cancelRegisterTaxInvoice}" ajax="false" immediate="true" onclick="PF('statusDialog').show();" />
+				</p:toolbarGroup>
+			</p:toolbar>
+			
+			<p:panelGrid columns="2" columnClasses="column1, column2" style="width:100%; margin-top:10px;">
+				<f:facet name="header">
+					#{message.ticketIssue_input_header}
+				</f:facet>
+				
+				<p:outputLabel for="roundUp" value="Round up" />
+				<h:panelGroup>
+					<p:selectOneRadio required="true" id="roundUp" value="#{taxInvIssueBean.roundUp}" rendered="#{taxInvIssueBean.screenMode!='1'}">
+						<p:ajax event="change" update="issueDetail" listener="#{taxInvIssueBean.changeRoundUp}" />
+						<f:selectItem itemLabel="Yes" itemValue="1" />
+						<f:selectItem itemLabel="No" itemValue="0" />
+					</p:selectOneRadio>
+					<h:outputText value="Yes" rendered="#{taxInvIssueBean.screenMode=='1' and taxInvIssueBean.roundUp == '1'}" />
+					<h:outputText value="No" rendered="#{taxInvIssueBean.screenMode=='1' and taxInvIssueBean.roundUp == '0'}" />
+				</h:panelGroup>
+				
+				<p:outputLabel value="Ref" />
+				<h:outputText value="#{taxInvIssueBean.refNoFormatted}" />
+				
+				<p:outputLabel for="issueDate" value="Issue Date" />
+				<h:panelGroup>
+					<p:calendar id="issueDate" value="#{taxInvIssueBean.issueDate}" showOn="button" rendered="#{taxInvIssueBean.screenMode!='1'}" required="true" pattern="dd/MM/yyyy" >
+						<p:ajax update="roe" event="dateSelect" listener="#{taxInvIssueBean.onchangeIssueDate}" />
+					</p:calendar>
+					<h:outputText value="#{taxInvIssueBean.issueDate}" rendered="#{taxInvIssueBean.screenMode=='1'}">
+		            	<f:convertDateTime pattern="dd/MM/yy" />
+		            </h:outputText>
+				</h:panelGroup>
+				
+				<p:outputLabel for="manualRate" value="Use manual rate:" />
+				<h:panelGroup>
+					<p:selectBooleanCheckbox id="manualRate" value="#{taxInvIssueBean.useManualRate}" rendered="#{taxInvIssueBean.screenMode!='1'}">
+			            <p:ajax update="roe, issueDetail" listener="#{taxInvIssueBean.onchangeUserManualRate}" />
+			        </p:selectBooleanCheckbox>
+			        <h:outputText value="✓" rendered="#{taxInvIssueBean.screenMode=='1' and taxInvIssueBean.useManualRate}" />
+				</h:panelGroup>
+				
+				<p:outputLabel for="roe" value="ROE" />
+				<h:panelGroup>
+					<pe:inputNumber id="roe" value="#{taxInvIssueBean.roe}" label="ROE" rendered="#{taxInvIssueBean.screenMode!='1'}" decimalPlaces="0" required="true" disabled="#{not taxInvIssueBean.useManualRate}" >
+						<p:ajax event="change" listener="#{taxInvIssueBean.onChangeRoe}" update="issueDetail"  />
+					</pe:inputNumber>
+					<h:outputText value="#{taxInvIssueBean.roe}" rendered="#{taxInvIssueBean.screenMode=='1'}">
+		            	<f:convertNumber pattern="#,###" />
+		            </h:outputText>
+				</h:panelGroup>
+				
+				<p:outputLabel for="paymentType" value="Payment type" />
+				<h:panelGroup>
+					<p:selectOneRadio required="true" id="paymentType" value="#{taxInvIssueBean.paymentType}" rendered="#{taxInvIssueBean.screenMode!='1'}">
+						<f:selectItem itemLabel="#{message.ticketIssue_paymentType_cash}" itemValue="0" />
+						<f:selectItem itemLabel="#{message.ticketIssue_paymentType_credit}" itemValue="1" />
+						<f:selectItem itemLabel="#{message.ticketIssue_paymentType_transfer}" itemValue="2" />
+						<f:selectItem itemLabel="#{message.ticketIssue_paymentType_account}" itemValue="3" />
+					</p:selectOneRadio>
+					<h:outputText value="Cash base" rendered="#{taxInvIssueBean.screenMode=='1' and taxInvIssueBean.paymentType=='0'}" />
+					<h:outputText value="Credit card" rendered="#{taxInvIssueBean.screenMode=='1' and taxInvIssueBean.paymentType=='1'}" />
+					<h:outputText value="Bank transfer" rendered="#{taxInvIssueBean.screenMode=='1' and taxInvIssueBean.paymentType=='2'}" />
+					<h:outputText value="Account receivable" rendered="#{taxInvIssueBean.screenMode=='1' and taxInvIssueBean.paymentType=='3'}" />
+				</h:panelGroup>
+				
+				<p:outputLabel for="invoiceNo" value="Tax Invoice No." />
+				<h:panelGroup>
+					<p:selectOneMenu id="invoiceNo" value="#{taxInvIssueBean.invoiceStockDetailId}" effect="fade" rendered="#{taxInvIssueBean.screenMode!='1'}" required="true">
+						 <f:selectItems value="#{taxInvIssueBean.invStockDetails}" var="detail" itemLabel="#{detail.invoiceStockNo}" itemValue="#{detail.id}"/>
+					</p:selectOneMenu>
+					<h:outputText value="#{taxInvIssueBean.invoiceStockDetailNo}" rendered="#{taxInvIssueBean.screenMode=='1'}" />
+				</h:panelGroup>
+				
+				<p:outputLabel for="companyName" value="Company" />
+				<h:panelGroup>
+					<p:inputText id="companyName" maxlength="200" value="#{taxInvIssueBean.companyName}" label="Company name" rendered="#{taxInvIssueBean.screenMode!='1'}" />
+					<p:commandButton value="Update dictionary" icon="ui-icon-link" actionListener="#{taxInvIssueBean.updateCompanyInfo}" rendered="#{taxInvIssueBean.screenMode!='1'}" />
+					<p:commandButton icon="ui-icon-home" title="Select company" immediate="true" actionListener="#{taxInvIssueBean.chooseCompany}" rendered="#{taxInvIssueBean.screenMode!='1' and not cargo}">
+						<p:ajax event="dialogReturn" listener="#{taxInvIssueBean.onCompanyChosen}" update="companyName, vatCode, address" />
+					</p:commandButton>
+					<p:commandButton icon="ui-icon-person" title="Select agent" immediate="true" actionListener="#{taxInvIssueBean.chooseAgent}" rendered="#{taxInvIssueBean.screenMode!='1'}">
+						<p:ajax event="dialogReturn" listener="#{taxInvIssueBean.onAgentChosen}" update="companyName, vatCode, address" />
+					</p:commandButton>
+					<h:outputText value="#{taxInvIssueBean.companyName}" rendered="#{taxInvIssueBean.screenMode=='1'}" />
+				</h:panelGroup>
+				
+				<p:outputLabel for="vatCode" value="Vat Code" />
+				<h:panelGroup>
+					<p:inputText id="vatCode" maxlength="15" value="#{taxInvIssueBean.vatCode}" label="Vat code" rendered="#{taxInvIssueBean.screenMode!='1'}" />
+					<h:outputText value="#{taxInvIssueBean.vatCode}" rendered="#{taxInvIssueBean.screenMode=='1'}" />
+				</h:panelGroup>
+				
+				<p:outputLabel for="address" value="Address" />
+				<h:panelGroup>
+					<p:inputText id="address" maxlength="4000" value="#{taxInvIssueBean.address}" label="Address" rendered="#{taxInvIssueBean.screenMode!='1'}" />
+					<h:outputText value="#{taxInvIssueBean.address}" rendered="#{taxInvIssueBean.screenMode=='1'}" />
+				</h:panelGroup>
+				
+			</p:panelGrid>
+			
+			<p:dataTable id="issueDetail" var="detail" value="#{taxInvIssueBean.taxInvoiceIssueDetails}" style="margin-top:10px">
+				<f:facet name="header">
+		           #{message.ticketIssue_list_header}
+		        </f:facet>
+				<p:column headerText="#{message.ticketIssue_number}">
+		            #{detail.ticketNo}
+		        </p:column>
+		        
+		        <p:column headerText="#{message.ticketIssue_route}">
+		            #{detail.route}
+		        </p:column>
+		        
+		        <p:column headerText="#{message.ticketIssue_quantity}">
+		        	<h:outputText value="#{detail.quantity}">
+		            	<f:convertNumber pattern="#,###" />
+		            </h:outputText>
+		        </p:column>
+		        
+		        <p:column headerText="#{message.ticketIssue_price}">
+		        	<h:outputText value="#{detail.price}">
+		            	<f:convertNumber pattern="#,##0.00" />
+		            </h:outputText>
+		            
+		        </p:column>
+		        
+		        <p:column headerText="#{message.ticketIssue_amount}">
+		        	<h:outputText value="#{detail.amount}">
+		            	<f:convertNumber pattern="#,##0.00" />
+		            </h:outputText>
+		        </p:column>
+		        
+		        <p:columnGroup type="footer">
+		        	<p:row>
+		        		<p:column footerText="" />
+		        		<p:column colspan="2" footerText="#{message.ticketIssue_total_amt_usd}&#160;#{taxInvIssueBean.displayTotalUsd}" />
+		        		<p:column colspan="2" footerText="#{message.ticketIssue_total_amt_vnd}&#160;#{taxInvIssueBean.displayTotalVnd}" />
+		        	</p:row>
+		        </p:columnGroup>
+		        
+		        <c:if test="#{taxInvIssueBean.screenMode!='1'}">
+			        <f:facet name="footer">
+			        	<p:commandButton value="Edit" icon="ui-icon-pencil" action="#{taxInvIssueBean.gotoEditDetailScreen}" ajax="false" onclick="PF('statusDialog').show();" />
+			        </f:facet>
+		        </c:if>
+
+			</p:dataTable>
+			
+			<p:toolbar>
+				<p:toolbarGroup align="left">
+					<p:commandButton value="Create" type="button" icon="ui-icon-check" rendered="#{taxInvIssueBean.screenMode=='0' and taxInvIssueBean.todayRateNotSet}" onclick="PF('createConfirm').show()" />
+					<p:commandButton value="Create" icon="ui-icon-check" action="#{taxInvIssueBean.registerTaxInvoice}" rendered="#{taxInvIssueBean.screenMode=='0' and not taxInvIssueBean.todayRateNotSet}" ajax="false" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="Store" icon="ui-icon-disk" action="#{taxInvIssueBean.storeTaxInvoice}" rendered="#{taxInvIssueBean.screenMode=='0'}" ajax="false" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="Edit" icon="ui-icon-pencil" action="#{taxInvIssueBean.editTaxInvoice}" rendered="#{taxInvIssueBean.screenMode=='1'}" ajax="false" onclick="PF('statusDialog').show();" disabled="#{taxInvIssueBean.selectedTaxInvIssue.status == 2 or not taxInvIssueBean.hasEditAuthority}" />
+					<p:commandButton value="Update" icon="ui-icon-check" action="#{taxInvIssueBean.updateTaxInvoice}" rendered="#{taxInvIssueBean.screenMode=='2'}" ajax="false" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="Use" icon="ui-icon-check" action="#{taxInvIssueBean.useTaxInvoice}" rendered="#{taxInvIssueBean.screenMode=='2' and taxInvIssueBean.selectedTaxInvIssue.status == 3}" ajax="false" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="Void" icon="ui-icon-minus" type="button" rendered="#{taxInvIssueBean.screenMode=='1'}" disabled="#{taxInvIssueBean.selectedTaxInvIssue.status == 2 or not taxInvIssueBean.hasEditAuthority}" onclick="PF('voidConfirm').show();" />
+					<p:commandButton value="Print" icon="ui-icon-document" action="#{taxInvIssueBean.printTaxInvIssueInfo}" rendered="#{taxInvIssueBean.screenMode=='1'}" disabled="#{taxInvIssueBean.selectedTaxInvIssue.status == 2}" ajax="false" />
+					<p:commandButton value="Cancel" icon="ui-icon-arrowreturnthick-1-w" action="#{taxInvIssueBean.cancelRegisterTaxInvoice}" ajax="false" immediate="true" onclick="PF('statusDialog').show();" />
+				</p:toolbarGroup>
+			</p:toolbar>
+	</h:panelGroup>
+	
+	<p:confirmDialog global="false" showEffect="fade" hideEffect="fade" widgetVar="voidConfirm" header="Confirmation" message="Are you sure?" icon="ui-icon-alert">
+		<p:commandButton value="Yes" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" action="#{taxInvIssueBean.voidTaxInvoice}" ajax="false" onclick="PF('voidConfirm').hide();PF('statusDialog').show();" />
+		<p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" onclick="PF('voidConfirm').hide();" />
+	</p:confirmDialog>
+	
+	<p:confirmDialog header="Confirmation" message="Today's rate has not been set yet! The nearest rate is selected." severity="alert" widgetVar="createConfirm">
+        <p:commandButton value="Yes" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" action="#{taxInvIssueBean.registerTaxInvoice}" ajax="false" onclick="PF('createConfirm').hide();PF('statusDialog').show();" />
+        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" onclick="PF('createConfirm').hide();" />
+    </p:confirmDialog>
+	
+</ui:define>
+</ui:composition>

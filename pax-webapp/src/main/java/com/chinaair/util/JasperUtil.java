@@ -20,6 +20,7 @@ public class JasperUtil {
 	public static void createReportAndDownloadPDF(String jasperName, List<?> dataList, Map<String, Object> parametersMap) throws Exception  {
 		JasperPrint print = createJasper(jasperName, dataList, parametersMap);
 		HttpServletResponse httpServletResponse=(HttpServletResponse)FacesContext.getCurrentInstance().getExternalContext().getResponse();
+		httpServletResponse.setContentType("application/pdf");
 		httpServletResponse.addHeader("Content-disposition", "attachment; filename=report.pdf");
 		//httpServletResponse.addHeader("Content-disposition", "inline; filename=report.pdf");//display PDF on browser
 		ServletOutputStream servletOutputStream=httpServletResponse.getOutputStream();

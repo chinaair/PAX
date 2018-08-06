@@ -20,12 +20,12 @@ public class Rate {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@Column(name="DATE", nullable = false)
+	@Column(name="DATE", nullable = false, unique = true)
 	@Temporal(TemporalType.DATE)
-	private Date datetime;
+	public Date datetime;
 	
 	@Column(name="RATE", nullable = false)
-	private BigDecimal rate;
+	public BigDecimal rate;
 	
 	public Long getId() {
 		return id;

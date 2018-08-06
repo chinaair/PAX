@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://primefaces.org/ui"
+        template="pageWithMenu.xhtml">
+	<ui:define name="content">
+		<f:metadata>
+			<f:event type="preRenderView" listener="#{taxInvoiceCodeBean.startConversation}" />
+		</f:metadata>
+		<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="#{message.taxInvoice_l_listScreenHeader}" /></h1>
+		<h:panelGroup styleClass="entry" layout="block" style="margin-top:20px;margin-bottom:20px">
+		 	<p:messages id="messages" showDetail="false" autoUpdate="true" closable="false" />
+			
+			<p:panelGrid columns="2" style="width:100%" id="inputArea"> 
+			    <p:outputLabel for="inputName" value="#{message.taxInvoice_l_templateCode}" />
+			    <p:inputText id="inputName" value="#{taxInvoiceCodeBean.inputName}" label="Tax invoice name" maxlength="50" required="true" />
+			    
+			    <p:outputLabel for="inputCode" value="#{message.taxInvoice_l_code}" />
+			  	<p:inputText id="inputCode" value="#{taxInvoiceCodeBean.inputCode}" label="Tax invoice code" maxlength="20" required="true" />
+			    
+			    <f:facet name="footer">  
+	          		<p:commandButton value="#{message.resource_b_add}" actionListener="#{taxInvoiceCodeBean.insertTaxInvoiceCode}" id="insertBtn" icon="ui-icon-disk" ajax="false" onclick="PF('statusDialog').show();" />
+	          		<p:commandButton value="#{message.resource_b_del}" actionListener="#{taxInvoiceCodeBean.deleteTaxInvoiceCode}" id="deleteBtn" icon="ui-icon-refresh" ajax="false" disabled="#{taxInvoiceCodeBean.buttonDelDisabled}" onclick="PF('statusDialog').show();" />
+	          		<p:commandButton value="#{message.resource_b_clear}" actionListener="#{taxInvoiceCodeBean.clearInput}" id="clearBtn" icon="ui-icon-refresh" ajax="false" onclick="PF('statusDialog').show();" />
+			    </f:facet>  
+			</p:panelGrid>
+			
+		 	<p:dataTable value="#{taxInvoiceCodeBean.invoiceCodeList}" var="invoiceCode" rowKey="#{invoiceCode.id}" style="margin-top:10px"
+		 		selection="#{taxInvoiceCodeBean.selectedTaxInvoiceCode}" selectionMode="single"
+				paginator="true" rows="10">
+				<p:ajax event="rowSelect" listener="#{taxInvoiceCodeBean.onSelectTaxInvoiceCode}"   
+                    update=":frm:inputArea" />
+				
+		        <p:column headerText="#{message.taxInvoice_l_templateCode}">
+		             <h:outputText value="#{invoiceCode.name}" />
+		        </p:column>
+		        
+		        <p:column headerText="#{message.taxInvoice_l_code}">
+		           <h:outputText value="#{invoiceCode.code}" />
+		        </p:column>
+		        
+	    	</p:dataTable>
+	    	
+		</h:panelGroup>
+	</ui:define>
+</ui:composition>

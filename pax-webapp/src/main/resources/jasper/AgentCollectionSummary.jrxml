@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AgentCollectionSummary" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="472a0bbb-ef34-4fdf-8ee5-a9f8db8d3c6a">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="closeDate" class="java.util.Date"/>
+	<parameter name="paymentType" class="java.lang.String"/>
+	<parameter name="totalUsd" class="java.math.BigDecimal"/>
+	<parameter name="totalVnd" class="java.math.BigDecimal"/>
+	<parameter name="systemClass" class="java.lang.String"/>
+	<field name="agentCode" class="java.lang.String"/>
+	<field name="agentName" class="java.lang.String"/>
+	<field name="totalAmtUsd" class="java.math.BigDecimal"/>
+	<field name="totalAmtVnd" class="java.math.BigDecimal"/>
+	<field name="ticketIssueList" class="java.util.List"/>
+	<pageHeader>
+		<band height="43" splitType="Stretch">
+			<image>
+				<reportElement x="0" y="0" width="168" height="43" uuid="0e933ddf-3302-49b9-aefd-3637195e2162"/>
+				<imageExpression><![CDATA["AE".equals($P{systemClass})?"../../images/banner_ae.png":"../../images/banner.png"]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="168" y="0" width="296" height="43" uuid="da18d93e-56ea-42b7-bb1b-2a8bc0bcbf43"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="DejaVu Sans" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{paymentType} + " Summary for Agent + Pax of "]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="464" y="0" width="91" height="43" uuid="cea2cdd5-711f-462f-909e-fe58be2c5f1e"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{closeDate}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="300" height="20" uuid="670c9c6a-bba6-480c-880f-493b1eeace93"/>
+				<box>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<text><![CDATA[Receipt number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="300" y="0" width="125" height="20" uuid="cd81b1a5-6954-44fc-9010-85e5461cb0e5"/>
+				<box>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<text><![CDATA[Amount (USD)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="425" y="0" width="130" height="20" uuid="7e241181-2d7c-44d9-8a48-96c4674eab4d"/>
+				<box>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<text><![CDATA[Equal VND]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="40" splitType="Stretch">
+			<textField>
+				<reportElement mode="Opaque" x="0" y="0" width="60" height="20" backcolor="#CCCCCC" uuid="0f0e22fc-c1cb-46e6-a59a-82b1d91785b1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{agentCode}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="60" y="0" width="240" height="20" backcolor="#CCCCCC" uuid="932f1920-4aa8-4ef9-ac62-68cebf6920e5"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{agentName}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement mode="Opaque" x="300" y="0" width="125" height="20" backcolor="#CCCCCC" uuid="a501b564-25cf-49d9-b647-01df134cc69f"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{totalAmtUsd}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement mode="Opaque" x="425" y="0" width="130" height="20" backcolor="#CCCCCC" uuid="388317c2-e6d8-4bfa-a24d-2fc15ba6dc6d"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{totalAmtVnd}]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement x="0" y="20" width="555" height="20" uuid="2cd03a81-79a6-44b6-837d-847a9521a552"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{ticketIssueList})]]></dataSourceExpression>
+				<subreportExpression><![CDATA["AgentCollectionSumDetails.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<summary>
+		<band height="20" splitType="Stretch">
+			<textField pattern="#,##0.00">
+				<reportElement x="300" y="0" width="125" height="20" uuid="7c0a9cd0-c25a-4db4-9bad-11cdd3bfaa86"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalUsd}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="425" y="0" width="130" height="20" uuid="f0fec8b8-9354-4b31-87c8-ac12ca470764"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalVnd}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="300" height="20" uuid="81e31898-4f0a-4865-8656-fe865bb2ae51"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<text><![CDATA[Grand total]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

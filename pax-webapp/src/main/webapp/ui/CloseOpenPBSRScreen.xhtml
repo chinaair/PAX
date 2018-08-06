@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:c="http://java.sun.com/jsp/jstl/core"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:pe="http://primefaces.org/ui/extensions"
+        template="pageWithMenu.xhtml">
+	<ui:define name="content">
+		<style type="text/css">
+			.column1{
+				width: 100px;
+			}
+			.column2{
+				width: auto;
+			}
+		</style>
+		<f:event type="preRenderView" listener="#{closeOpenPbsrBean.startConversation}" />
+		<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="#{message.ticketIssue_header}" /></h1>
+		<h:panelGroup id="mainPanel" styleClass="entry" layout="block">
+			<p:messages id="messages" showDetail="false" autoUpdate="true" closable="false" />
+			<p:toolbar>
+				<p:toolbarGroup align="left">
+					<p:commandButton value="Open" icon="ui-icon-unlocked" action="#{closeOpenPbsrBean.openPbsr}" ajax="false" rendered="#{not closeOpenPbsrBean.opened}" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="Close" icon="ui-icon-locked" action="#{closeOpenPbsrBean.closePbsr}" ajax="false" rendered="#{closeOpenPbsrBean.opened}" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="Print Cash Agent" icon="ui-icon-print" action="#{closeOpenPbsrBean.printCashAgents}" ajax="false" disabled="#{closeOpenPbsrBean.opened}" />
+					<p:commandButton value="Print Cr Agent" icon="ui-icon-print" action="#{closeOpenPbsrBean.printCreditAgents}" ajax="false" disabled="#{closeOpenPbsrBean.opened}" />
+					<p:commandButton value="Print Bank Tansfer Agent" icon="ui-icon-print" action="#{closeOpenPbsrBean.printBankTransferAgents}" ajax="false" disabled="#{closeOpenPbsrBean.opened}" />
+					<p:commandButton value="Print Acc Receivale Agent" icon="ui-icon-print" action="#{closeOpenPbsrBean.printAccountReceivableAgents}" ajax="false" disabled="#{closeOpenPbsrBean.opened}" />
+				</p:toolbarGroup>
+			</p:toolbar>
+			<p:panelGrid columns="2" columnClasses="column1, column2" style="width:100%; margin-top:10px;">
+				<f:facet name="header">
+					#{message.ticketIssue_input_header}
+				</f:facet>
+				
+				<h:outputLabel for="reportDate" value="Report Date" />
+				<p:calendar id="reportDate" navigator="true" value="#{closeOpenPbsrBean.reportDate}" showOn="button" required="true" readonlyInput="true" pattern="dd/MM/yyyy">
+					<p:ajax event="dateSelect" listener="#{closeOpenPbsrBean.onchangeReportDate}" update="mainPanel" />
+				</p:calendar>
+				
+			</p:panelGrid>
+			
+			<p:dataTable var="empIssue" value="#{closeOpenPbsrBean.dailyTicketIssueByEmps}" style="margin-top:10px">
+				<f:facet name="header">
+		           #{message.ticketIssue_list_header}
+		        </f:facet>
+		        
+		        <p:columnGroup type="header">
+			        <p:row>
+			        	<p:column headerText="Refer Number" />
+			        	<p:column headerText="Payment type" />
+			        	<p:column headerText="Agent" />
+			        	<p:column headerText="Amount USD" />
+			        	<p:column headerText="Amount VND" />
+			        </p:row>
+		        </p:columnGroup>
+				
+		         <p:subTable var="detail" value="#{empIssue.ticketIssueList}">
+		         	<f:facet name="header">
+			           #{empIssue.emp.empName}
+			        </f:facet>
+			        
+			        <p:column>
+			        	#{detail.formattedId}
+			        </p:column>
+			        
+			        <p:column>
+			        	<h:outputText value="Cash" rendered="#{detail.paymentType == '0'}" />
+			        	<h:outputText value="Credit card" rendered="#{detail.paymentType == '1'}" />
+			        	<h:outputText value="Bank transfer" rendered="#{detail.paymentType == '2'}" />
+			        	<h:outputText value="Account receivable" rendered="#{detail.paymentType == '3'}" />
+			        </p:column>
+			        
+			        <p:column>
+			        	#{detail.agent.name}
+			        </p:column>
+			        
+			        <p:column>
+			        	<h:outputText value="#{detail.amountUsd}">
+			            	<f:convertNumber pattern="#,##0.00" />
+			            </h:outputText>
+			        </p:column>
+			        
+			        <p:column>
+			        	<h:outputText value="#{detail.amountVnd}">
+			            	<f:convertNumber pattern="#,###" />
+			            </h:outputText>
+			        </p:column>
+			        
+			        <p:columnGroup type="footer">
+			        	<p:row>
+			        		<p:column footerText="Totals: " colspan="3" style="text-align:right"/>
+			        		<p:column footerText="#{empIssue.totalAmtUsdStr}" />
+			        		<p:column footerText="#{empIssue.totalAmtVndStr}" />
+			        	</p:row>
+			        </p:columnGroup>
+		         </p:subTable>
+		        
+			</p:dataTable>
+			<p:toolbar style="margin-top:10px;">
+				<p:toolbarGroup align="left">
+					<p:commandButton value="Open" icon="ui-icon-unlocked" action="#{closeOpenPbsrBean.openPbsr}" ajax="false" rendered="#{not closeOpenPbsrBean.opened}" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="Close" icon="ui-icon-locked" action="#{closeOpenPbsrBean.closePbsr}" ajax="false" rendered="#{closeOpenPbsrBean.opened}" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="Print Cash Agent" icon="ui-icon-print" action="#{closeOpenPbsrBean.printCashAgents}" ajax="false" disabled="#{closeOpenPbsrBean.opened}" />
+					<p:commandButton value="Print Cr Agent" icon="ui-icon-print" action="#{closeOpenPbsrBean.printCreditAgents}" ajax="false" disabled="#{closeOpenPbsrBean.opened}" />
+					<p:commandButton value="Print Bank Tansfer Agent" icon="ui-icon-print" action="#{closeOpenPbsrBean.printBankTransferAgents}" ajax="false" disabled="#{closeOpenPbsrBean.opened}" />
+					<p:commandButton value="Print Acc Receivale Agent" icon="ui-icon-print" action="#{closeOpenPbsrBean.printAccountReceivableAgents}" ajax="false" disabled="#{closeOpenPbsrBean.opened}" />
+				</p:toolbarGroup>
+			</p:toolbar>
+		</h:panelGroup>
+	</ui:define>
+</ui:composition>

@@ -1,45 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"
-xmlns:h="http://java.sun.com/jsf/html"
-xmlns:f="http://java.sun.com/jsf/core"
-xmlns:ui="http://java.sun.com/jsf/facelets"
-xmlns:p="http://primefaces.org/ui">
-
-<f:view contentType="text/html">
-<h:head>
-		<f:facet name="first">
-			<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-			<meta content='text/html; charset=UTF-8' http-equiv="Content-Type" />
-			<title>China Airlines PAX</title>
-			<link rel="shortcut icon" type="image/png" href="#{request.contextPath}/images/logo.png" />
-		</f:facet>
-		<link type="text/css" rel="stylesheet" href="#{request.contextPath}/css/default.css" />
-	</h:head>
-
-<h:body>
-	<p:layout fullPage="true">
-		<p:layoutUnit position="center">
-	        <h:form>
-	            <p:panelGrid columns="2">
-				    <f:facet name="header">
-				        Login
-				    </f:facet>
-				  
-				    <h:outputLabel for="username" value="User name: *" />  
-				    <p:inputText id="username" value="#{loginBean.username}" label="user name" />
-				    <h:outputLabel for="password" value="Password: *" />
-				    <p:password id="password" value="#{loginBean.password}" label="password" />
-				    
-				    <f:facet name="footer">
-				        <p:commandButton type="button" value="Login" icon="ui-icon-check" style="margin:0"/>
-				    </f:facet>
-				</p:panelGrid>
-	        </h:form>
-	    </p:layoutUnit>
-	</p:layout>
-</h:body>
-
-</f:view>
-</html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://primefaces.org/ui"
+        template="pageWithoutMenu.xhtml">
+    <f:metadata>
+    	<f:viewParam name="sessionended" value="#{loginBean.sessionEnded}" />
+    	<f:viewAction action="#{loginBean.initScreen}" />
+	</f:metadata>
+	<ui:define name="content">
+		<p:messages id="messages" showDetail="false" autoUpdate="true" closable="false" />
+		<p:panelGrid id="panel" columns="2" style="margin-left:auto;margin-right:auto;width:400px;" rendered="#{not loginBean.loggedIn}">
+			<f:facet name="header">
+				#{message.login_header}
+			</f:facet>
+			
+			<p:outputLabel for="username" value="#{message.login_userName}:" />
+			<p:inputText id="username" value="#{loginBean.userName}" label="#{message.login_userName}" maxlength="100" required="true" />
+			
+			<p:outputLabel for="password" value="#{message.login_password}:"/>
+			<p:password id="password" value="#{loginBean.password}" maxlength="100" label="#{message.login_password}" required="true" />
+			
+			<p:outputLabel for="language" value="Language:"/>
+			<h:selectOneMenu id="language" value="#{loginBean.localeCode}" onchange="PF('statusDialog').show();submit()" valueChangeListener="#{loginBean.countryLocaleCodeChanged}">
+	            <f:selectItem itemLabel="English" itemValue="en" />
+	            <f:selectItem itemLabel="Vietnamese" itemValue="vi" />
+	        </h:selectOneMenu>
+			
+			<f:facet name="footer">
+				<p:commandButton value="#{message.login_btnLogin}" icon="ui-icon-unlocked" action="#{loginBean.login}" ajax="false" onclick="PF('statusDialog').show();" update="content" />
+				<p:commandButton value="Clear" icon="ui-icon-refresh" update="panel" process="@this">
+	                <p:resetInput target="panel" />
+	            </p:commandButton>
+			</f:facet>
+		</p:panelGrid>
+		<p:outputPanel style="margin-left:auto;margin-right:auto;width:400px;" rendered="#{loginBean.loggedIn}">
+	        <h1>Welcome to the system, #{loginBean.loginUser.empName}!</h1>
+	    </p:outputPanel>
+	</ui:define>
+</ui:composition>

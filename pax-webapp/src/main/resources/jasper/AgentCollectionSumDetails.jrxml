@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AgentCollectionSumDetails" pageWidth="555" pageHeight="842" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="82e1b2aa-f56b-4b0b-a4ee-113d85ccd3f5">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<field name="formattedId" class="java.lang.String"/>
+	<field name="amountUsd" class="java.math.BigDecimal"/>
+	<field name="roe" class="java.math.BigDecimal"/>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="300" height="20" uuid="02f3da91-a045-4ea0-ab2f-057a79d5072f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{formattedId}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="300" y="0" width="125" height="20" uuid="71e85ff8-d757-41d9-934e-ba0c1032900b"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{amountUsd}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="425" y="0" width="130" height="20" uuid="bbaa5b5b-81de-4569-a8ba-1d107978731c"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{amountUsd}.multiply($F{roe}).setScale(0, 4).divide(new java.math.BigDecimal(1000)).setScale(0, 4).multiply(new java.math.BigDecimal(1000))]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

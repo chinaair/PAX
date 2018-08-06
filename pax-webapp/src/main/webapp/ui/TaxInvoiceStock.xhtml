@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:pe="http://primefaces.org/ui/extensions"
+        template="pageWithMenu.xhtml">
+	<ui:define name="content">
+		<f:metadata>
+			<f:event type="preRenderView" listener="#{invoiceStockBean.startConversation}" />
+		</f:metadata>
+		<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="#{message.taxInvoice_l_stockListHeader}" /></h1>
+		
+		<h:panelGroup styleClass="entry" layout="block">
+			<p:messages id="messages" showDetail="false" autoUpdate="true" closable="false" />
+			<p:toolbar>
+				<p:toolbarGroup align="left">
+					<p:commandButton value="#{message.resource_b_new}" icon="ui-icon-document" action="#{invoiceStockBean.gotoNewInvoiceStock}" ajax="false" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="#{message.resource_b_view}" icon="ui-icon-document" action="#{invoiceStockBean.gotoViewInvoiceStock}" ajax="false" onclick="PF('statusDialog').show();" />
+				</p:toolbarGroup>
+			</p:toolbar>
+			
+			<p:dataTable var="detail" value="#{invoiceStockBean.invoiceStockList}" rowKey="#{detail.id}" style="margin-top:10px"
+                selection="#{invoiceStockBean.selectedInvoiceStock}" 
+                paginator="true" rows="5"
+                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                 rowsPerPageTemplate="5,10,15" selectionMode="single" id="taxInvIssueTable" lazy="true">
+				<f:facet name="header">
+		           #{message.taxInvoice_l_stockListTable}
+		        </f:facet>
+		        
+		        <p:column headerText="#{message.taxInvoice_l_invoiceTemplateCodeHeader}" > 
+		            #{detail.taxInvoiceCode.name}
+		        </p:column>
+		        
+		        <p:column headerText="#{message.taxInvoice_l_invoiceCodeHeader}">
+		            #{detail.taxInvoiceCode.code}
+		        </p:column>
+		        
+		        <p:column headerText="#{message.taxInvoice_l_prefixHeader}">
+		            #{detail.prefix}
+		        </p:column>
+		        
+		        <p:column headerText="#{message.taxInvoice_l_startNoHeader}">
+		        	#{detail.startNo}
+		        </p:column>
+		        
+		        <p:column headerText="#{message.taxInvoice_l_quantityHeader}" sortBy="#{detail.quantity}">
+		            <h:outputText value="#{detail.quantity}">
+		            	<f:convertNumber pattern="#,##0" />
+		            </h:outputText>
+		        </p:column>
+		        
+		        <p:column headerText="#{message.taxInvoice_l_createDateHeader}"  sortBy="#{detail.createDate}">
+		            <h:outputText value="#{detail.createDate}">
+		            	<f:convertDateTime pattern="dd/MM/yy" />
+		            </h:outputText>
+		        </p:column>
+		        
+			</p:dataTable>
+			
+			<p:toolbar style="margin-top:10px;">
+				<p:toolbarGroup align="left">
+					<p:commandButton value="#{message.resource_b_new}" icon="ui-icon-document" action="#{invoiceStockBean.gotoNewInvoiceStock}" ajax="false" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="#{message.resource_b_view}" icon="ui-icon-document" action="#{invoiceStockBean.gotoViewInvoiceStock}" ajax="false" onclick="PF('statusDialog').show();" />
+				</p:toolbarGroup>
+			</p:toolbar>
+		</h:panelGroup>
+		
+	</ui:define>
+</ui:composition>

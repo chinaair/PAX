@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:c="http://java.sun.com/jsp/jstl/core"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:pe="http://primefaces.org/ui/extensions"
+        template="pageWithMenu.xhtml">
+	<ui:define name="content">
+		<f:metadata>
+			<f:event type="preRenderView" listener="#{masterBean.startConversation}" />
+		</f:metadata>
+		<style type="text/css">
+			.column1{
+				width: 100px;
+			}
+			.column2{
+				width: auto;
+			}
+		</style>
+		<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="#{message.master_header}" /></h1>
+			<h:panelGroup styleClass="entry" layout="block">
+				<p:messages id="messages" showDetail="false" autoUpdate="true" closable="false" />
+				<p:panelGrid id="i_form" columns="2" columnClasses="column1, column2" style="width:100%; margin-top:10px;">
+					<f:facet name="header">
+						#{message.master_inputMaster} 
+					</f:facet>
+					
+					 <p:outputLabel for="level" value="#{message.master_level} : " />
+				    <h:panelGroup>	
+				    	<h:selectOneMenu id="level" value="#{masterBean.level}" required="true" >  
+				    		<f:selectItem itemLabel="#{message.master_level_1}" itemValue="1" /> 
+			                <f:selectItem itemLabel="#{message.master_level_2}" itemValue="2" />
+			                <f:selectItem itemLabel="#{message.master_level_3}" itemValue="3" />  
+			                 <p:ajax update="parentMaster"  
+	                        listener="#{masterBean.onchangeLevelCombobox}"/>  
+			            </h:selectOneMenu>  
+				    </h:panelGroup>
+				    
+				    <p:outputLabel for="parentMaster" value="#{message.master_parentMaster} : " />
+				    <h:panelGroup>	
+				    	<h:selectOneMenu id="parentMaster" value="#{masterBean.masterParent}" effect="fade">  
+				    		 <f:selectItems value="#{masterBean.parentMasterCombobox}" var="detail" itemLabel="#{detail.name}" itemValue="#{detail.masterNo}" />  
+			            </h:selectOneMenu>  
+				    </h:panelGroup>
+					
+					 <p:outputLabel for="masterNo" value="#{message.master_masterNo} : " />
+				    <h:panelGroup>
+				    	<p:inputText id="masterNo" value="#{masterBean.masterNo}"
+				    				 label="#{message.master_masterNo}" size="10" minlength="4"  maxlength="4"
+				    				 disabled="#{masterBean.screenMode=='2'}"
+				    				 required="true" />
+				    </h:panelGroup>
+					
+				    <p:outputLabel for="masterName" value="#{message.master_masterName} : " />
+				    <h:panelGroup>
+				    	<p:inputText id="masterName" value="#{masterBean.name}"
+				    				 label="#{message.master_masterName}" size="100"  maxlength="1000"
+				    				 required="true"/>
+				    </h:panelGroup>
+				    
+				    <p:outputLabel for="masterValue" value="#{message.master_masterValue} : " />
+				    <h:panelGroup>
+				    	<p:inputText id="masterValue" value="#{masterBean.value}"
+				    				 label="#{message.master_masterValue}" size="100"  maxlength="1000"
+				    				 required="true"  />
+				    </h:panelGroup>
+				    
+				    <f:facet name="footer" id="i_btn">
+				     	<p:commandButton id="i_btn_add" value="#{message.master_add}" icon="ui-icon-plus" action="#{masterBean.registerMaster}" rendered="#{masterBean.screenMode=='1'}" ajax="false"  />
+						<p:commandButton id="i_btn_update" value="#{message.master_update}" icon="ui-icon-check" action="#{masterBean.updateMaster}" rendered="#{masterBean.screenMode=='2'}" ajax="false" update=":frm:i_table"/>
+						<p:commandButton id="i_btn_delete" value="#{message.master_delete}" icon="ui-icon-close" action="#{masterBean.deleteMaster}" rendered="#{masterBean.screenMode=='2' and masterBean.masterNo != '0001'}"  ajax="false" update=":frm:i_table"/>
+						<p:commandButton id="i_btn_refresh" value="#{message.master_refresh}" icon="ui-icon-arrowreturnthick-1-w" action="#{masterBean.refresh}" ajax="false" immediate="true" update=":frm:i_form,:frm:i_table"/>
+					</f:facet>
+				    
+				</p:panelGrid>
+			</h:panelGroup>
+		
+		<h:panelGroup styleClass="entry" layout="block">
+			<p:fragment autoUpdate="true" >
+					<p:panel header="#{message.master_header_search}" toggleable="true" toggleSpeed="500" closeSpeed="500" widgetVar="panel" collapsed="true" style="margin-top:10px">
+					<table border="0" cellspacing="0" cellpadding="0" width="100%">
+						<tr>
+							<td><p:outputLabel for="searchMasterNo" value="#{message.master_masterNo} : " />
+								<p:inputText value="#{masterBean.searchMaster.masterNo}" id="searchMasterNo" minlength="4"  maxlength="4" label="#{message.master_masterNo}"/>
+							</td>
+							<td><p:outputLabel for="searchParentMaster" value="#{message.master_parentMaster} : " />
+								<p:inputText value="#{masterBean.searchMaster.masterParent}" id="searchParentMaster"  minlength="4"  maxlength="4" label="#{message.master_parentMaster}"/>
+							</td>
+							<td><p:outputLabel for="searchMasterName" value="#{message.master_masterName} : " />
+								<p:inputText value="#{masterBean.searchMaster.name}" id="searchMasterName"  maxlength="1000" label="#{message.master_masterName}"/>
+							</td>
+							
+							<td>
+								<p:commandButton value="#{message.master_bt_search}" icon="ui-icon-document" actionListener="#{masterBean.searchMaster}" ajax="true" />
+							</td>
+						</tr>
+					</table>
+					
+				</p:panel>
+				
+			<p:dataTable id="i_table" value="#{masterBean.masterList}" var="item" style="margin-top:10px" 
+		 		rowKey="#{item.masterNo}"
+				paginator="true" rows="10" selection="#{masterBean.selectedMaster}" selectionMode="single">
+				
+				 <p:ajax event="rowSelect" listener="#{masterBean.onRowSelectMaster}" update=":frm:i_form"/>  
+       			
+				<f:facet name="header">
+		           #{message.master_list_header}
+		        </f:facet>
+		  		<p:column headerText="#{message.master_masterNo}">
+		             <h:outputText value="#{item.masterNo}" ></h:outputText>
+		        </p:column>
+		        
+		        <p:column headerText="#{message.master_parentMaster}">
+		             <h:outputText value="#{item.parentMasterName}" style="text-align:center"></h:outputText>
+		        </p:column>
+		        <p:column headerText="#{message.master_masterName}">
+		             <h:outputText value="#{item.name}" ></h:outputText>
+		        </p:column>
+		        
+		        <p:column headerText="#{message.master_masterValue}">
+		             <h:outputText value="#{item.value}" ></h:outputText>
+		        </p:column>
+		        
+		        <p:column headerText="#{message.master_level}">
+		             <h:outputText value="#{item.level}" style="text-align:center"></h:outputText>
+		        </p:column>
+	    	</p:dataTable>
+	    	</p:fragment>
+		</h:panelGroup>
+	</ui:define>
+</ui:composition>

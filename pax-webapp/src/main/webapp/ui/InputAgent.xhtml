@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:pe="http://primefaces.org/ui/extensions"
+        template="pageWithMenu.xhtml">
+	<ui:define name="content">
+	<f:event type="preRenderView" listener="#{selectAgentBean.startConversation}" />
+	<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="#{message.agent_title}" /></h1>
+	<h:panelGroup styleClass="entry" layout="block" style="margin-top:20px;margin-bottom:20px">
+		<p:messages id="messages" showDetail="false" autoUpdate="true" closable="false" />
+		<p:tabMenu activeIndex="0">
+			<p:menuitem value="#{message.agent_inputAgent}" action="#{selectAgentBean.initInputAgentScreen}" icon="ui-icon-star" immediate="true"/>
+	    	<p:menuitem value="#{message.agent_agentList}" action="#{selectAgentBean.initAgentListScreen}" icon="ui-icon-search" immediate="true" />
+		</p:tabMenu>
+		<p:panelGrid columns="2" style="width:100%" id="display"> 
+			<p:outputLabel for="code" value="#{message.agent_agentCode} : " />
+			<h:panelGroup>
+		  		<p:inputText value="#{selectAgentBean.code}" id="code" required="true" label="#{message.agent_agentCode}" maxlength="8" size="20"/>
+		  		<p:outputLabel value=" (xxx-xxxx)" />
+		  	</h:panelGroup>
+		  	 
+		    <p:outputLabel for="name" value="#{message.agent_agentName} : " />
+		    <p:inputText id="name" value="#{selectAgentBean.name}" label="#{message.agent_agentName}" size="100"  maxlength="1000"  />
+		    
+		     <p:outputLabel for="company" value="#{message.agent_company} : " />
+		    <p:inputText id="company" value="#{selectAgentBean.company}" label="#{message.agent_company}" size="100"  maxlength="1000"  />
+		    
+		     <p:outputLabel for="vat_code" value="#{message.agent_vat} : " />
+		    <p:inputText id="vat_code" value="#{selectAgentBean.vat_code}" label="#{message.agent_vat}"  size="100"  maxlength="20" />
+		    
+		      <p:outputLabel for="phone" value="#{message.agent_phone} : " />
+		    <p:inputText id="phone" value="#{selectAgentBean.phone}" label="#{message.agent_phone}"   size="100"  maxlength="100"/>
+		    
+		    <p:outputLabel for="fax" value="#{message.agent_fax} : " />
+		    <p:inputText id="fax" value="#{selectAgentBean.fax}" label="#{message.agent_fax}" size="100"   maxlength="100" />
+		    
+		    <p:outputLabel for="address" value="#{message.agent_address} : " />
+		    <p:inputText id="address" value="#{selectAgentBean.address}" label="#{message.agent_address}"  size="100"  maxlength="1000"/>
+		    
+		    <p:outputLabel for="email" value="#{message.agent_email} : " />
+		    <p:inputText id="email" value="#{selectAgentBean.email}" label="#{message.agent_email}" size="100" maxlength="100" />
+		    
+		    <h:outputText value="#{message.agent_location} : " />  
+	        <p:selectOneRadio id="location" value="#{selectAgentBean.location}">  
+	            <f:selectItem itemLabel="#{message.agent_location_option0}" itemValue="0" />  
+	            <f:selectItem itemLabel="#{message.agent_location_option1}" itemValue="1" />  
+	        </p:selectOneRadio>  
+		    
+		    
+		     <h:outputText value="#{message.agent_type} : " />  
+	        <p:selectOneRadio id="type" value="#{selectAgentBean.type}">  
+	            <f:selectItem itemLabel="#{message.agent_type_option0}" itemValue="0" />  
+	            <f:selectItem itemLabel="#{message.agent_type_option1}" itemValue="1" />  
+	        </p:selectOneRadio>  
+	        
+	         <h:outputText value="#{message.agent_DepositType} : " />  
+	        <p:selectOneRadio id="deposit" value="#{selectAgentBean.deposit_type}">  
+	            <f:selectItem itemLabel="#{message.agent_DepositType_option0}" itemValue="0" />  
+	            <f:selectItem itemLabel="#{message.agent_DepositType_option1}" itemValue="1" />  
+	        </p:selectOneRadio>  
+	        
+	        <p:outputLabel for="deposit_amt" value="#{message.agent_depositAmount} : " />
+		    <pe:inputNumber id="deposit_amt" value="#{selectAgentBean.deposit_amt}" label="#{message.agent_depositAmount}" decimalPlaces="2"  size="20" maxlength="13"/>
+	        
+	        <p:outputLabel for="popupButtonCal" value="#{message.agent_validDate} :  " />
+		  	<p:calendar value="#{selectAgentBean.valid_date}" id="popupButtonCal"  size="20"
+		  				required="true" label="#{message.agent_validDate}" showOn="button"
+		  				pattern="dd/MM/yyyy" />
+	        
+		    <f:facet name="footer">  
+          		<p:commandButton value="#{message.agent_add}" actionListener="#{selectAgentBean.add}" id="i_add" icon="ui-icon-plus" ajax="false" />
+          		<p:commandButton value="#{message.agent_update}" actionListener="#{selectAgentBean.update}" id="i_update" icon="ui-icon-disk" ajax="false" />
+          		<p:commandButton value="#{message.agent_delete}" actionListener="#{selectAgentBean.delete}" id="i_delete" icon="ui-icon-close"  ajax="false"/>
+          		<p:commandButton value="#{message.agent_refresh}" actionListener="#{selectAgentBean.refresh}" id="i_clear" icon="ui-icon-refresh"  ajax="false"/>
+		    </f:facet>  
+		</p:panelGrid>
+	</h:panelGroup>
+	</ui:define>
+</ui:composition>

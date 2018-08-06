@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:c="http://java.sun.com/jsp/jstl/core"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:pe="http://primefaces.org/ui/extensions"
+        template="pageWithMenu.xhtml">
+	<ui:define name="content">
+		<style type="text/css">
+			.column1{
+				width: 100px;
+			}
+			.column2{
+				width: auto;
+			}
+		</style>
+		<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="#{message.employee_header}" /></h1>
+		<h:panelGroup styleClass="entry" layout="block">
+			<p:messages id="messages" showDetail="false" autoUpdate="true" closable="false" />
+			<p:toolbar>
+				<p:toolbarGroup align="left">
+					<p:commandButton value="#{message.employee_add}" icon="ui-icon-plus" action="#{employeeBean.registerEmployee}" rendered="#{employeeBean.screenMode=='0'}" ajax="false" />
+					<p:commandButton value="#{message.employee_edit}" icon="ui-icon-document" action="#{employeeBean.editEmployee}" rendered="#{employeeBean.screenMode=='1'}" ajax="false" />
+					<p:commandButton value="#{message.employee_update}" icon="ui-icon-check" action="#{employeeBean.updateEmployee}" rendered="#{employeeBean.screenMode=='2'}" ajax="false" />
+					<p:commandButton value="#{message.employee_delete}" icon="ui-icon-close" action="#{employeeBean.deleteEmployee}" rendered="#{employeeBean.screenMode=='1'}" ajax="false" />
+					<p:commandButton value="#{message.employee_cancel}" icon="ui-icon-arrowreturnthick-1-w" action="#{employeeBean.cancelRegisterEmployee}" ajax="false" immediate="true"/>
+				</p:toolbarGroup>
+			</p:toolbar>
+			<p:panelGrid columns="2" columnClasses="column1, column2" style="width:100%; margin-top:10px;">
+				<f:facet name="header">
+					#{message.employee_inputEmployee} 
+				</f:facet>
+				
+			  	 
+			    <p:outputLabel for="name" value="#{message.employee_employeeName} : " />
+			    <h:panelGroup>
+			    	<p:inputText id="name" value="#{employeeBean.empName}"
+			    				 label="#{message.employee_employeeName}" size="100"  maxlength="1000"
+			    				 required="true"  
+			    				 rendered="#{employeeBean.screenMode!='1'}"/>
+			    	<h:outputText value="#{employeeBean.empName}" rendered="#{employeeBean.screenMode=='1'}" />
+			    </h:panelGroup>
+			    
+			     <p:outputLabel for="userId" value="#{message.employee_userId} : " />
+			    <h:panelGroup>	
+			    	<p:inputText id="userId" value="#{employeeBean.userId}" 
+			    				label="#{message.employee_userId}"  size="100"  maxlength="1000"
+			    				required="true"  
+			    				rendered="#{employeeBean.screenMode!='1'}"/>
+			    	<h:outputText value="#{employeeBean.userId}" rendered="#{employeeBean.screenMode=='1'}" />
+			    </h:panelGroup>
+			    
+			     <p:outputLabel for="password" value="#{message.employee_password} : " />
+			    <h:panelGroup>	
+			    	<p:inputText  id="password" value="#{employeeBean.password}" feedback="true"
+			    				label="#{message.employee_password}"  size="100"  maxlength="20" 
+			    				required="true"  
+			    				rendered="#{employeeBean.screenMode!='1'}"/>  
+			    	<h:outputText value="#{employeeBean.password}" rendered="#{employeeBean.screenMode=='1'}" />
+			      </h:panelGroup>
+			      
+			    <p:outputLabel for="position" value="#{message.employee_position} : " />
+			    <h:panelGroup>	
+				    <p:inputText id="position" value="#{employeeBean.position}" 
+				    			label="#{message.employee_position}"   size="100"  maxlength="100"
+				    			rendered="#{employeeBean.screenMode!='1'}"/>
+				    <h:outputText value="#{employeeBean.position}" rendered="#{employeeBean.screenMode=='1'}" />
+			    </h:panelGroup>
+			    
+			    <p:outputLabel for="taxCode" value="#{message.employee_taxCode} : " />
+			    <h:panelGroup>
+			    	<p:inputText id="taxCode" value="#{employeeBean.taxCode}" 
+			    				label="#{message.employee_taxCode}" size="100"   maxlength="20" 
+			    				rendered="#{employeeBean.screenMode!='1'}"/>
+			    	<h:outputText value="#{employeeBean.taxCode}" rendered="#{employeeBean.screenMode=='1'}" />
+			    </h:panelGroup>
+			    
+			    
+			    <p:outputLabel for="options" value="#{message.menu_useFlag} : " />
+			    <h:panelGroup>	
+				     <p:selectOneRadio id="options" value="#{employeeBean.usageFlag}" rendered="#{employeeBean.screenMode !='1'}">  
+			            <f:selectItem itemLabel="#{message.menu_useFlag_true}" itemValue="true" />  
+			            <f:selectItem itemLabel="#{message.menu_useFlag_false}" itemValue="false" />  
+			        </p:selectOneRadio>  
+				    <h:outputText value="#{message.menu_useFlag_true}" rendered="#{employeeBean.screenMode=='1' and employeeBean.usageFlag}" />
+				    <h:outputText value="#{message.menu_useFlag_false}" rendered="#{employeeBean.screenMode=='1' and !employeeBean.usageFlag}" />
+			    </h:panelGroup>
+			</p:panelGrid>
+			
+			<p:fragment autoUpdate="true">  
+					<p:panelGrid columns="2" columnClasses="column1, column2" style="width:100%; margin-top:10px;" rendered="#{employeeBean.screenMode!='1'}">
+						<f:facet name="header">
+							#{message.employee_authority}
+						</f:facet>
+						
+						<p:outputLabel for="menuId" value="#{message.employee_menu} : " />
+						 <h:panelGroup>	
+					    	<h:selectOneMenu id="menuId" value="#{employeeBean.selectedMenuId}">  
+					    		 <f:selectItems value="#{employeeBean.menuCombobox}" />  
+				            </h:selectOneMenu>
+				            <p:commandButton value="#{message.employee_add_authority}" update="menuList" id="addMenu"  ajax="true"
+		             							actionListener="#{employeeBean.addMenu}" styleClass="ui-icon-plus"/>   
+					     </h:panelGroup>
+					</p:panelGrid>
+					
+					<p:dataTable id="menuList" value="#{employeeBean.menuList}" var="item" style="margin-top:10px">
+						<f:facet name="header">
+				           #{message.menu_list_header}
+				        </f:facet>
+				        <p:column headerText="#{message.menu_menuName}">
+				             <h:outputText value="#{item.menu}" ></h:outputText>
+				        </p:column>
+				        
+				         <p:column headerText="#{message.menu_menu_vi}">
+				             <h:outputText value="#{item.menu_vi}" ></h:outputText>
+				        </p:column>	
+				        
+				         <p:column rendered="#{employeeBean.screenMode !='1'}">
+				             <p:commandButton value="#{message.employee_remove_authority}" update="menuList" id="removeMenu"  ajax="true"
+		             							actionListener="#{employeeBean.removeMenu(item)}"/>  
+				        </p:column>	
+						  
+					</p:dataTable>
+			</p:fragment>
+			<p:toolbar style="margin-top:10px;">
+				<p:toolbarGroup align="left">
+					<p:commandButton value="#{message.employee_add}" icon="ui-icon-plus" action="#{employeeBean.registerEmployee}" rendered="#{employeeBean.screenMode=='0'}" ajax="false" />
+					<p:commandButton value="#{message.employee_edit}" icon="ui-icon-document" action="#{employeeBean.editEmployee}" rendered="#{employeeBean.screenMode=='1'}" ajax="false" />
+					<p:commandButton value="#{message.employee_update}" icon="ui-icon-check" action="#{employeeBean.updateEmployee}" rendered="#{employeeBean.screenMode=='2'}" ajax="false" />
+					<p:commandButton value="#{message.employee_delete}" icon="ui-icon-close" action="#{employeeBean.deleteEmployee}" rendered="#{employeeBean.screenMode=='1'}" ajax="false" />
+					<p:commandButton value="#{message.employee_cancel}" icon="ui-icon-arrowreturnthick-1-w" action="#{employeeBean.cancelRegisterEmployee}" ajax="false" immediate="true"/>
+				</p:toolbarGroup>
+			</p:toolbar>
+		</h:panelGroup>
+	</ui:define>
+</ui:composition>

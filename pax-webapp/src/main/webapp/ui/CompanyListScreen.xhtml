@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:pe="http://primefaces.org/ui/extensions"
+        template="pageWithMenu.xhtml">
+	<ui:define name="content">
+		<f:event type="preRenderView" listener="#{companyBean.startConversation}" />
+		<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="#{message.company_header}" /></h1>
+		<h:panelGroup styleClass="entry" layout="block">
+			<p:messages id="messages" showDetail="false" autoUpdate="true" closable="false" />
+			<p:toolbar>
+				<p:toolbarGroup align="left">
+					<p:commandButton value="#{message.company_new}" icon="ui-icon-plus" action="#{companyBean.gotoNewCompanyScreen}" ajax="false" />
+					<p:commandButton value="#{message.company_view}" icon="ui-icon-document" action="#{companyBean.gotoViewCompanyScreen}" ajax="false" />
+					<p:commandButton value="#{message.company_print}" icon="ui-icon-print" action="#{companyBean.printCompanyInfo}" ajax="false" />
+				</p:toolbarGroup>
+			</p:toolbar>
+			
+			<p:panel header="#{message.company_header_search}" toggleable="true" toggleSpeed="500" closeSpeed="500" widgetVar="panel" collapsed="false" style="margin-top:10px">
+				<table border="0" cellspacing="0" cellpadding="0" width="100%">
+					<tr>
+						<td><p:outputLabel for="code" value="#{message.company_companyName} : " /></td>
+						<td><p:inputText value="#{companyBean.searchCompanyName}" id="code" label="#{message.company_companyName}"/></td>
+						<td><p:outputLabel for="vat" value="#{message.company_vat} : " /></td>
+						<td><p:inputText value="#{companyBean.searchCompanyVat}" id="vat" label="#{message.company_vat}"/></td>
+					<td><p:commandButton value="#{message.company_bt_search}" icon="ui-icon-document" actionListener="#{companyBean.searchCompany}" ajax="false" /></td>
+					</tr>
+				</table>
+			</p:panel>
+			<p:dataTable value="#{companyBean.companyList}" var="company" style="margin-top:10px"
+		 		rowKey="#{company.id}"
+				paginator="true" rows="10" selection="#{companyBean.selectedCompany}" selectionMode="single">
+				
+				 <p:ajax event="rowSelect" listener="#{companyBean.onRowSelectCompany}"/>  
+       			
+				<f:facet name="header">
+		           #{message.company_list_header}
+		        </f:facet>
+		  
+		        <p:column headerText="#{message.company_companyName}" filterBy="company" filterMatchMode="contains">
+		             <h:outputText value="#{company.company}" ></h:outputText>
+		        </p:column>
+		        
+		        <p:column headerText="#{message.company_address}" filterBy="address" filterMatchMode="contains">
+		             <h:outputText value="#{company.address}" ></h:outputText>
+		        </p:column>
+		        
+		        <p:column headerText="#{message.company_vat}" filterBy="vat" filterMatchMode="contains">
+		             <h:outputText value="#{company.vat}" ></h:outputText>
+		        </p:column>
+		        
+		        <p:column headerText="#{message.company_phone}">
+		             <h:outputText value="#{company.phone}" ></h:outputText>
+		        </p:column>
+		        
+		        <p:column headerText="#{message.company_email}">
+		             <h:outputText value="#{company.email}" ></h:outputText>
+		        </p:column>
+		        
+	    	</p:dataTable>
+			
+			<p:toolbar style="margin-top:10px;">
+				<p:toolbarGroup align="left">
+					<p:commandButton value="#{message.company_new}" icon="ui-icon-plus" action="#{companyBean.gotoNewCompanyScreen}" ajax="false" />
+					<p:commandButton value="#{message.company_view}" icon="ui-icon-document" action="#{companyBean.gotoViewCompanyScreen}" ajax="false" />
+					<p:commandButton value="#{message.company_print}" icon="ui-icon-print" action="#{companyBean.printCompanyInfo}" ajax="false" />
+				</p:toolbarGroup>
+			</p:toolbar>
+		</h:panelGroup>
+			
+	</ui:define>
+</ui:composition>

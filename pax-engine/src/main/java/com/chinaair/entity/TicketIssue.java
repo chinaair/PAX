@@ -15,10 +15,12 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import javax.persistence.Version;
 
 @Entity
@@ -30,14 +32,15 @@ public class TicketIssue implements Serializable {
 	@Id
 	@Column(name="ID", unique = true, nullable = false)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	public Long id;
 	
 	@Column(name="ISSUE_DATE", nullable = false)
 	@Temporal(TemporalType.DATE)
-	private Date issueDate;
+	public Date issueDate;
 	
-	@Column(name="ROE", nullable = false)
-	private BigDecimal roe;
+	@ManyToOne(fetch=FetchType.EAGER)
+    @JoinColumn(name="RATE_ID", insertable=true, updatable=true)
+	private Rate rate;
 	
 	/**
 	 * 0: Cash
@@ -55,11 +58,17 @@ public class TicketIssue implements Serializable {
 	@Column(name="TAX_INVOICE_ID")
 	private Long taxInvoiceId;
 	
-	@Column(name="REPORTDATE")
-	@Temporal(TemporalType.DATE)
-	private Date reportDate;
+	@OneToOne(fetch=FetchType.EAGER)
+    @JoinColumn(name="TAX_INVOICE_ID", insertable=false, updatable=false)
+	private TaxInvoiceIssue taxInvoiceIssue;
 	
-	//input employee
+	@Column(name="INPUT_EMP")
+	private Long inputEmpId;
+	
+	@OneToOne(fetch=FetchType.EAGER)
+    @JoinColumn(name="INPUT_EMP", insertable=false, updatable=false)
+	private Employee inputEmp;
+	
 	@Version
 	@Column(name="LASTUPDATE", nullable = false)
 	private Timestamp lastUpdate;
@@ -68,16 +77,37 @@ public class TicketIssue implements Serializable {
 	 * 0: has no tax invoice
 	 * 1: has tax invoice
 	 * 2: voided
+	 * 3: save temp
 	 */
 	@Column(name="STATUS", nullable = false)
-	private String status;
+	public String status;
 	
-	@Column(name="AMT_USD")
-	private BigDecimal amount_usd;
+	@Column(name="AMOUNT_USD")
+	public BigDecimal amountUsd;
 	
-	@OneToMany(targetEntity=TicketIssueDetail.class, mappedBy="ticketIssue")
-	@OrderBy("id")
+	@Transient
+	public BigDecimal amountVnd;
+	
+	@Column(name="MODIFYDATETIME")
+	private Timestamp modifyDatetime;
+	
+	@Column(name="MODIFY_EMP")
+	private Long modifyEmpId;
+	
+	@OneToOne(fetch=FetchType.EAGER)
+    @JoinColumn(name="MODIFY_EMP", insertable=false, updatable=false)
+	private Employee modifyEmp;
+	
+	@OneToMany(targetEntity=TicketIssueDetail.class, mappedBy="ticketIssue",fetch=FetchType.LAZY)
+	@OrderBy("dispOrder")
 	private List<TicketIssueDetail> ticketIssueDetail;
+	
+	@Column(name="REPORTED_DATE")
+	@Temporal(TemporalType.DATE)
+	private Date reportedDate;
+	
+	@Column(name="RETAIL_CUSTNAME")
+	private String retailCustomerName;
 
 	public Long getId() {
 		return id;
@@ -99,12 +129,12 @@ public class TicketIssue implements Serializable {
 		this.issueDate = issueDate;
 	}
 
-	public BigDecimal getRoe() {
-		return roe;
+	public Rate getRate() {
+		return rate;
 	}
 
-	public void setRoe(BigDecimal roe) {
-		this.roe = roe;
+	public void setRate(Rate rate) {
+		this.rate = rate;
 	}
 
 	public String getPaymentType() {
@@ -131,12 +161,28 @@ public class TicketIssue implements Serializable {
 		this.taxInvoiceId = taxInvoiceId;
 	}
 
-	public Date getReportDate() {
-		return reportDate;
+	public TaxInvoiceIssue getTaxInvoiceIssue() {
+		return taxInvoiceIssue;
 	}
 
-	public void setReportDate(Date reportDate) {
-		this.reportDate = reportDate;
+	public void setTaxInvoiceIssue(TaxInvoiceIssue taxInvoiceIssue) {
+		this.taxInvoiceIssue = taxInvoiceIssue;
+	}
+
+	public Long getInputEmpId() {
+		return inputEmpId;
+	}
+
+	public void setInputEmpId(Long inputEmpId) {
+		this.inputEmpId = inputEmpId;
+	}
+
+	public Employee getInputEmp() {
+		return inputEmp;
+	}
+
+	public void setInputEmp(Employee inputEmp) {
+		this.inputEmp = inputEmp;
 	}
 
 	public Timestamp getLastUpdate() {
@@ -155,12 +201,20 @@ public class TicketIssue implements Serializable {
 		this.status = status;
 	}
 
-	public BigDecimal getAmount_usd() {
-		return amount_usd;
+	public BigDecimal getAmountUsd() {
+		return amountUsd;
 	}
 
-	public void setAmount_usd(BigDecimal amount_usd) {
-		this.amount_usd = amount_usd;
+	public void setAmountUsd(BigDecimal amountUsd) {
+		this.amountUsd = amountUsd;
+	}
+	
+	public BigDecimal getAmountVnd() {
+		return amountVnd;
+	}
+
+	public void setAmountVnd(BigDecimal amountVnd) {
+		this.amountVnd = amountVnd;
 	}
 
 	public List<TicketIssueDetail> getTicketIssueDetail() {
@@ -169,6 +223,53 @@ public class TicketIssue implements Serializable {
 
 	public void setTicketIssueDetail(List<TicketIssueDetail> ticketIssueDetail) {
 		this.ticketIssueDetail = ticketIssueDetail;
+	}
+
+	public Timestamp getModifyDatetime() {
+		return modifyDatetime;
+	}
+
+	public void setModifyDatetime(Timestamp modifyDatetime) {
+		this.modifyDatetime = modifyDatetime;
+	}
+
+	public Long getModifyEmpId() {
+		return modifyEmpId;
+	}
+
+	public void setModifyEmpId(Long modifyEmpId) {
+		this.modifyEmpId = modifyEmpId;
+	}
+
+	public Employee getModifyEmp() {
+		return modifyEmp;
+	}
+
+	public void setModifyEmp(Employee modifyEmp) {
+		this.modifyEmp = modifyEmp;
+	}
+
+	public Date getReportedDate() {
+		return reportedDate;
+	}
+
+	public void setReportedDate(Date reportedDate) {
+		this.reportedDate = reportedDate;
+	}
+	
+	public BigDecimal getRoe() {
+		if(rate != null) {
+			return rate.getRate();
+		}
+		return new BigDecimal(0);
+	}
+
+	public String getRetailCustomerName() {
+		return retailCustomerName;
+	}
+
+	public void setRetailCustomerName(String retailCustomerName) {
+		this.retailCustomerName = retailCustomerName;
 	}
 
 }

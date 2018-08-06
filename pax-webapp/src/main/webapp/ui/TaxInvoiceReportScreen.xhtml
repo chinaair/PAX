@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:pe="http://primefaces.org/ui/extensions"
+        template="pageWithMenu.xhtml">
+	<ui:define name="content">
+		<f:event type="preRenderView" listener="#{taxInvoiceReportBean.startConversation}" />
+		<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="TAX INVOICE MONTHLY REPORT" /></h1>
+		<h:panelGroup styleClass="entry" layout="block">
+			<p:messages id="messages" showDetail="false" autoUpdate="true" closable="false" />
+			<p:toolbar>
+				<p:toolbarGroup align="left">
+					<p:commandButton value="Report Pax Invoice" icon="ui-icon-document" action="#{taxInvoiceReportBean.printPaxInvoice}" ajax="false" />
+					<p:commandButton value="Report Cgo Invoice" icon="ui-icon-document" action="#{taxInvoiceReportBean.printCgoInvoice}" ajax="false" rendered="#{loginBean.systemClass != 'AE'}" />
+				</p:toolbarGroup>
+			</p:toolbar>
+			
+			<p:panelGrid id="inputArea" columns="2" style="width:100%; margin-top:10px;">
+				<f:facet name="header">
+					Search condition
+				</f:facet>
+				
+				<p:outputLabel value="Select month" />
+				<p:inputMask id="reportYearMonth" value="#{taxInvoiceReportBean.reportYearMonth}" mask="9999/99" required="true" >
+					<p:ajax event="change" listener="#{taxInvoiceReportBean.onChangeYearMonth}" update="paxInvoiceCount cgoInvoiceCount" />
+				</p:inputMask>
+				
+				<h:outputLabel value="Pax invoice number" />
+				<h:outputText id="paxInvoiceCount" value="#{taxInvoiceReportBean.paxInvoiceCount}" />
+				
+				<h:outputLabel value="Cargo invoice number" rendered="#{loginBean.systemClass != 'AE'}" />
+				<h:outputText id="cgoInvoiceCount" value="#{taxInvoiceReportBean.cgoInvoiceCount}" rendered="#{loginBean.systemClass != 'AE'}" />
+				
+			</p:panelGrid>
+			
+			<p:toolbar style="margin-top:10px;">
+				<p:toolbarGroup align="left">
+					<p:commandButton value="Report Pax Invoice" icon="ui-icon-document" action="#{taxInvoiceReportBean.printPaxInvoice}" ajax="false" />
+					<p:commandButton value="Report Cgo Invoice" icon="ui-icon-document" action="#{taxInvoiceReportBean.printCgoInvoice}" ajax="false" rendered="#{loginBean.systemClass != 'AE'}" />
+				</p:toolbarGroup>
+			</p:toolbar>
+		</h:panelGroup>
+			
+	</ui:define>
+</ui:composition>

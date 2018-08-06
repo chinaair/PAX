@@ -51,6 +51,9 @@ public class TicketIssueDetail implements Serializable {
 	@Version
 	@Column(name="LASTUPDATE", nullable = false)
 	private Timestamp lastUpdate;
+	
+	@Column(name="DISPORDER", nullable = false)
+	private Long dispOrder;
 
 	public Long getId() {
 		return id;
@@ -122,6 +125,14 @@ public class TicketIssueDetail implements Serializable {
 
 	public void setLastUpdate(Timestamp lastUpdate) {
 		this.lastUpdate = lastUpdate;
+	}
+
+	public Long getDispOrder() {
+		return dispOrder;
+	}
+
+	public void setDispOrder(Long dispOrder) {
+		this.dispOrder = dispOrder;
 	}
 
 }

@@ -9,49 +9,49 @@ import javax.faces.context.FacesContext;
 
 public class JSFUtil {
 	
-	public static void addError(ResourceBundle bundle, String componentId, String resourceKey) {
+	public static void addError(ResourceBundle bundle, String displayTarget, String componentId, String resourceKey) {
 		FacesContext.getCurrentInstance().addMessage(
-				null,
+				displayTarget,
 				new FacesMessage(FacesMessage.SEVERITY_ERROR, bundle
 						.getString(resourceKey), null));
 		setInvalidComponent(componentId);
 	}
 	
-	public static void addError(String componentId, String resourceKey) {
+	public static void addError(String displayTarget, String componentId, String resourceKey) {
 		FacesContext.getCurrentInstance().addMessage(
-				null,
+				displayTarget,
 				new FacesMessage(FacesMessage.SEVERITY_ERROR,
 						getResourceBundle().getString(resourceKey), null));
 		setInvalidComponent(componentId);
 	}
 	
-	public static void addErrorMessage(String componentId, String errorMessage) {
+	public static void addErrorMessage(String displayTarget, String componentId, String errorMessage) {
 		FacesContext.getCurrentInstance().addMessage(
-				null,
+				displayTarget,
 				new FacesMessage(FacesMessage.SEVERITY_ERROR, errorMessage,
 						null));
 		setInvalidComponent(componentId);
 	}
 	
-	public static void addInfo(ResourceBundle bundle, String componentId, String resourceKey) {
+	public static void addInfo(ResourceBundle bundle, String displayTarget, String componentId, String resourceKey) {
 		FacesContext.getCurrentInstance().addMessage(
-				null,
+				displayTarget,
 				new FacesMessage(FacesMessage.SEVERITY_INFO, bundle
 						.getString(resourceKey), null));
 		setInvalidComponent(componentId);
 	}
 	
-	public static void addInfo(String componentId, String resourceKey) {
+	public static void addInfo(String displayTarget, String componentId, String resourceKey) {
 		FacesContext.getCurrentInstance().addMessage(
-				null,
+				displayTarget,
 				new FacesMessage(FacesMessage.SEVERITY_INFO,
 						getResourceBundle().getString(resourceKey), null));
 		setInvalidComponent(componentId);
 	}
 	
-	public static void addInfoMessage(String componentId, String errorMessage) {
+	public static void addInfoMessage(String displayTarget, String componentId, String errorMessage) {
 		FacesContext.getCurrentInstance().addMessage(
-				null,
+				displayTarget,
 				new FacesMessage(FacesMessage.SEVERITY_INFO, errorMessage,
 						null));
 		setInvalidComponent(componentId);

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="TaxInvoiceIssue" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9a514cba-29a4-4304-9fd4-f83a71711e87">
+	<property name="ireport.zoom" value="1.3310000000000055"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="474"/>
+	<parameter name="companyName" class="java.lang.String"/>
+	<parameter name="vatCode" class="java.lang.String"/>
+	<parameter name="address" class="java.lang.String"/>
+	<parameter name="totalAmount" class="java.math.BigDecimal"/>
+	<parameter name="totalAmountText" class="java.lang.String"/>
+	<parameter name="paymentType" class="java.lang.String"/>
+	<parameter name="printDate" class="java.util.Date"/>
+	<parameter name="inputEmpName" class="java.lang.String"/>
+	<parameter name="roe" class="java.math.BigDecimal"/>
+	<parameter name="detail" class="java.util.List"/>
+	<parameter name="isCargo" class="java.lang.String"/>
+	<title>
+		<band height="325" splitType="Stretch">
+			<textField>
+				<reportElement x="163" y="207" width="392" height="28" uuid="78008936-a218-4d96-8546-9226b9f46bb7"/>
+				<textElement verticalAlignment="Bottom" markup="none">
+					<font fontName="DejaVu Sans" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{companyName}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="111" y="239" width="444" height="14" uuid="3d682dd4-df4f-4191-9813-8407939656ae"/>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font fontName="DejaVu Sans" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{vatCode}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="85" y="258" width="470" height="28" uuid="f51ac205-5360-49c1-a3ff-c497eb4034a9"/>
+				<textElement verticalAlignment="Top" markup="none">
+					<font fontName="DejaVu Sans" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{address}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="130" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="130" uuid="5baf5576-5af2-499c-8c47-767ee34835ae"/>
+				<subreportParameter name="roe">
+					<subreportParameterExpression><![CDATA[$P{roe}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="isCargo">
+					<subreportParameterExpression><![CDATA[$P{isCargo}]]></subreportParameterExpression>
+				</subreportParameter>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($P{detail})]]></dataSourceExpression>
+				<subreportExpression><![CDATA["TaxInvoiceIssueDetailCgo.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<summary>
+		<band height="243" splitType="Stretch">
+			<textField pattern="#,##0">
+				<reportElement x="238" y="30" width="317" height="14" uuid="e4f4e8de-f3bd-4f3c-a5a2-67cec28f458b"/>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font fontName="DejaVu Sans" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalAmount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="111" y="50" width="444" height="28" uuid="8551642f-53d5-44d7-91dd-868bb7bd1d05"/>
+				<textElement verticalAlignment="Top" markup="none">
+					<font fontName="DejaVu Sans" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalAmountText}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="185" y="84" width="370" height="14" uuid="913cc298-ad0e-42b3-b799-f248cd57777a"/>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font fontName="DejaVu Sans" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{paymentType}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="433" y="104" width="139" height="14" uuid="aae4b7fa-ad21-409a-8b25-2ee7b0af75c8"/>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font fontName="DejaVu Sans" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{printDate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="170" width="135" height="14" uuid="c9fc5997-b394-4b6e-b254-aeb6ccf436e9"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Bán hàng qua ĐT/Fax]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="189" y="227" width="130" height="14" uuid="32819edc-4cf9-450b-bb54-22071e557bc0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="DejaVu Sans" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{inputEmpName}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="391" y="184" width="136" height="52" uuid="e1e19a2a-bcb9-40f2-8605-72e377869155"/>
+				<imageExpression><![CDATA["../../images/signature2.png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="85" y="12" width="13" height="14" uuid="16050b39-8448-4403-912c-9d86ce1e5a8c"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[0]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

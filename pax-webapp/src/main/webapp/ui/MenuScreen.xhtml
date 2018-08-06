@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:c="http://java.sun.com/jsp/jstl/core"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:pe="http://primefaces.org/ui/extensions"
+        template="pageWithMenu.xhtml">
+	<ui:define name="content">
+		<style type="text/css">
+			.column1{
+				width: 100px;
+			}
+			.column2{
+				width: auto;
+			}
+		</style>
+		<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="#{message.menu_header}" /></h1>
+		<h:panelGroup styleClass="entry" layout="block">
+			<p:messages id="messages" showDetail="false" autoUpdate="true" closable="false" />
+			<p:toolbar>
+				<p:toolbarGroup align="left">
+					<p:commandButton value="#{message.menu_add}" icon="ui-icon-plus" action="#{menuBean.registerMenu}" rendered="#{menuBean.screenMode=='0'}" ajax="false" />
+					<p:commandButton value="#{message.menu_edit}" icon="ui-icon-document" action="#{menuBean.editMenu}" rendered="#{menuBean.screenMode=='1'}" ajax="false" />
+					<p:commandButton value="#{message.menu_update}" icon="ui-icon-check" action="#{menuBean.updateMenu}" rendered="#{menuBean.screenMode=='2'}" ajax="false" />
+					<p:commandButton value="#{message.menu_delete}" icon="ui-icon-close" action="#{menuBean.deleteMenu}" rendered="#{menuBean.screenMode=='1'}" ajax="false" />
+					<p:commandButton value="#{message.menu_cancel}" icon="ui-icon-arrowreturnthick-1-w" action="#{menuBean.cancelRegisterMenu}" ajax="false" immediate="true"/>
+				</p:toolbarGroup>
+			</p:toolbar>
+			<p:panelGrid columns="2" columnClasses="column1, column2" style="width:100%; margin-top:10px;">
+				<f:facet name="header">
+					#{message.menu_inputMenu} 
+				</f:facet>
+				
+			  	 
+			    <p:outputLabel for="menu" value="#{message.menu_menuName} : " />
+			    <h:panelGroup>
+			    	<p:inputText id="menu" value="#{menuBean.menu}"
+			    				 label="#{message.menu_menuName}" size="100"  maxlength="1000"
+			    				 required="true"  
+			    				 rendered="#{menuBean.screenMode!='1'}"/>
+			    	<h:outputText value="#{menuBean.menu}" rendered="#{menuBean.screenMode=='1'}" />
+			    </h:panelGroup>
+			    
+			     <p:outputLabel for="menu_vi" value="#{message.menu_menu_vi} : " />
+			    <h:panelGroup>
+			    	<p:inputText id="menu_vi" value="#{menuBean.menu_vi}"
+			    				 label="#{message.menu_menu_vi}" size="100"  maxlength="1000"
+			    				 required="true"  
+			    				 rendered="#{menuBean.screenMode!='1'}"/>
+			    	<h:outputText value="#{menuBean.menu_vi}" rendered="#{menuBean.screenMode=='1'}" />
+			    </h:panelGroup>
+			    
+			    
+			     <p:outputLabel for="level" value="#{message.menu_level} : " />
+			    <h:panelGroup>	
+			    	<h:selectOneMenu id="level" value="#{menuBean.level}" required="true" rendered="#{menuBean.screenMode !='1'}">  
+			    		<f:selectItem itemLabel="#{message.menu_level_1}" itemValue="1" /> 
+		                <f:selectItem itemLabel="#{message.menu_level_2}" itemValue="2" />
+		                <f:selectItem itemLabel="#{message.menu_level_3}" itemValue="3" />  
+		                 <p:ajax update="parentId,link"  
+                        listener="#{menuBean.onchangeLevelCombobox}" reRender="link" />  
+		            </h:selectOneMenu>  
+			    	<h:outputText value="#{menuBean.level}" rendered="#{menuBean.screenMode=='1'}" />
+			    </h:panelGroup>
+			    
+			     <p:outputLabel for="parentId" value="#{message.menu_parentId} : " />
+			    <h:panelGroup>	
+			    	<h:selectOneMenu id="parentId" value="#{menuBean.parentId}" disabled="#{menuBean.level == 1}" rendered="#{menuBean.screenMode!='1'}">  
+			    		 <f:selectItems value="#{menuBean.parentMenuCombobox}" />  
+		            </h:selectOneMenu>  
+			    	<h:outputText value="#{menuBean.parentMenu}" rendered="#{menuBean.screenMode=='1'}" />
+			      </h:panelGroup>
+			      
+			    <p:outputLabel for="link" value="#{message.menu_link} : " />
+			    <h:panelGroup>
+			    	<p:inputText id="link" value="#{menuBean.link}"
+			    				 label="#{message.menu_link}" size="100"  maxlength="1000"
+			    				 required="#{menuBean.level gt 1}"
+			    				 disabled="#{menuBean.level == 1}"
+			    				 rendered="#{menuBean.screenMode!='1'}"/>
+			    	<h:outputText value="#{menuBean.link}" rendered="#{menuBean.screenMode=='1'}" />
+			    </h:panelGroup>
+			    
+			    <p:outputLabel for="icon" value="#{message.menu_icon} : " />
+			    <h:panelGroup>
+			    	<p:inputText id="icon" value="#{menuBean.icon}"
+			    				 label="#{message.menu_icon}" size="100"  maxlength="1000"
+			    				 required="#{menuBean.level gt 1}" 
+			    				 rendered="#{menuBean.screenMode!='1'}"/>
+			    	<h:outputText value="#{menuBean.icon}" rendered="#{menuBean.screenMode=='1'}" />
+			    </h:panelGroup>
+			      
+			    <p:outputLabel for="options" value="#{message.menu_useFlag} : " />
+			    <h:panelGroup>	
+				     <p:selectOneRadio id="options" value="#{menuBean.useFlag}" rendered="#{menuBean.screenMode !='1'}">  
+			            <f:selectItem itemLabel="#{message.menu_useFlag_true}" itemValue="true" />  
+			            <f:selectItem itemLabel="#{message.menu_useFlag_false}" itemValue="false" />  
+			        </p:selectOneRadio>  
+				    <h:outputText value="#{message.menu_useFlag_true}" rendered="#{menuBean.screenMode=='1' and menuBean.useFlag}" />
+				    <h:outputText value="#{message.menu_useFlag_false}" rendered="#{menuBean.screenMode=='1' and !menuBean.useFlag}" />
+			    </h:panelGroup>
+			    
+			</p:panelGrid>
+			
+			<p:toolbar style="margin-top:10px;">
+				<p:toolbarGroup align="left">
+					<p:commandButton value="#{message.menu_add}" icon="ui-icon-plus" action="#{menuBean.registerMenu}" rendered="#{menuBean.screenMode=='0'}" ajax="false" />
+					<p:commandButton value="#{message.menu_edit}" icon="ui-icon-document" action="#{menuBean.editMenu}" rendered="#{menuBean.screenMode=='1'}" ajax="false" />
+					<p:commandButton value="#{message.menu_update}" icon="ui-icon-check" action="#{menuBean.updateMenu}" rendered="#{menuBean.screenMode=='2'}" ajax="false" />
+					<p:commandButton value="#{message.menu_delete}" icon="ui-icon-close" action="#{menuBean.deleteMenu}" rendered="#{menuBean.screenMode=='1'}" ajax="false" />
+					<p:commandButton value="#{message.menu_cancel}" icon="ui-icon-arrowreturnthick-1-w" action="#{menuBean.cancelRegisterMenu}" ajax="false" immediate="true"/>
+				</p:toolbarGroup>
+			</p:toolbar>
+		</h:panelGroup>
+	</ui:define>
+</ui:composition>

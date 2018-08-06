@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:pe="http://primefaces.org/ui/extensions"
+        template="pageWithMenu.xhtml">
+	<ui:define name="content">
+		<style type="text/css">
+			.column1{
+				width: 100px;
+			}
+			.column2{
+				width: auto;
+			}
+		</style>
+		<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="#{message.taxInvoice_l_inputStockHeader}" /></h1>
+		
+		<h:panelGroup styleClass="entry" layout="block">
+			<p:messages id="messages" showDetail="false" autoUpdate="true" closable="false" />
+			<p:toolbar>
+				<p:toolbarGroup align="left">
+					<p:commandButton value="#{message.resource_b_register}" icon="ui-icon-document" action="#{invoiceStockBean.registerInvoiceStock}" ajax="false" rendered="#{invoiceStockBean.mode == 0}" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="#{message.resource_b_edit}" icon="ui-icon-document" action="#{invoiceStockBean.toggleEditMode}" ajax="false" disabled="#{not invoiceStockBean.updatable}" rendered="#{invoiceStockBean.mode == 1}" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="#{message.resource_b_update}" icon="ui-icon-document" action="#{invoiceStockBean.updateInvoiceStock}" ajax="false" rendered="#{invoiceStockBean.mode == 2}" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="#{message.resource_b_del}" icon="ui-icon-document" action="#{invoiceStockBean.deleteInvoiceStock}" ajax="false" disabled="#{not invoiceStockBean.updatable}" rendered="#{invoiceStockBean.mode == 1}" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="#{message.resource_b_cancel}" icon="ui-icon-document" action="#{invoiceStockBean.backToList}" ajax="false" immediate="true" onclick="PF('statusDialog').show();" />
+				</p:toolbarGroup>
+			</p:toolbar>
+			
+			<p:panelGrid columns="2" columnClasses="column1, column2" style="width:100%; margin-top:10px;">
+				<f:facet name="header">
+					#{message.taxInvoice_l_inputHeader}
+				</f:facet>
+				
+				<p:outputLabel value="#{message.taxInvoice_l_createDateHeader}" />
+				<h:outputText value="#{invoiceStockBean.createDate}">
+	            	<f:convertDateTime pattern="dd/MM/yy" />
+	            </h:outputText>
+				
+				<p:outputLabel for="invoiceCode" value="#{message.taxInvoice_l_invoiceCodeHeader}" />
+				<h:panelGroup>
+					<p:selectOneMenu id="invoiceCode" value="#{invoiceStockBean.taxInvoiceCodeId}" required="true" rendered="#{invoiceStockBean.mode == 0 or invoiceStockBean.mode == 2}">
+						<f:selectItems value="#{invoiceStockBean.taxInvoiceCodes}" var="invoiceCode" itemLabel="#{invoiceCode.code} (#{invoiceCode.name})" itemValue="#{invoiceCode.id}" />
+					</p:selectOneMenu>
+					<h:outputText value="#{invoiceStockBean.taxInvoiceCodeName}" rendered="#{invoiceStockBean.mode == 1}" />
+				</h:panelGroup>
+				
+				<p:outputLabel for="prefix" value="#{message.taxInvoice_l_prefixHeader}" />
+				<h:panelGroup>
+					<p:inputText id="prefix" value="#{invoiceStockBean.prefix}" maxlength="3" label="Prefix" required="true" rendered="#{invoiceStockBean.mode == 0 or invoiceStockBean.mode == 2}" />
+					<h:outputText value="#{invoiceStockBean.prefix}" rendered="#{invoiceStockBean.mode == 1}" />
+				</h:panelGroup>
+				
+				<p:outputLabel for="startNo" value="#{message.taxInvoice_l_startNoHeader}" />
+				<h:panelGroup>
+					<pe:inputNumber id="startNo" value="#{invoiceStockBean.startNo}" minValue="0" maxValue="9999" label="Start number" decimalPlaces="0" required="true" rendered="#{invoiceStockBean.mode == 0 or invoiceStockBean.mode == 2}"/>
+					<h:outputText value="#{invoiceStockBean.startNo}" rendered="#{invoiceStockBean.mode == 1}">
+		            	<f:convertNumber pattern="#,##0" />
+		            </h:outputText>
+				</h:panelGroup>
+				
+				<p:outputLabel for="quantity" value="#{message.taxInvoice_l_quantityHeader}" />
+				<h:panelGroup>
+					<pe:inputNumber id="quantity" value="#{invoiceStockBean.quantity}" minValue="1" maxValue="9999" label="Quantity" decimalPlaces="0" required="true" rendered="#{invoiceStockBean.mode == 0 or invoiceStockBean.mode == 2}" />
+					<h:outputText value="#{invoiceStockBean.quantity}" rendered="#{invoiceStockBean.mode == 1}">
+		            	<f:convertNumber pattern="#,##0" />
+		            </h:outputText>
+				</h:panelGroup>
+				
+				<p:outputLabel value="#{message.taxInvoice_l_used}" rendered="#{invoiceStockBean.mode != 0}" />
+				<h:outputText value="#{invoiceStockBean.used}" rendered="#{invoiceStockBean.mode != 0}">
+	            	<f:convertNumber pattern="#,##0" />
+	            </h:outputText>
+	            
+	            <p:outputLabel value="#{message.taxInvoice_l_blank}" rendered="#{invoiceStockBean.mode != 0}" />
+				<h:outputText value="#{invoiceStockBean.blank}" rendered="#{invoiceStockBean.mode != 0}">
+	            	<f:convertNumber pattern="#,##0" />
+	            </h:outputText>
+				
+			</p:panelGrid>
+			
+			<p:dataTable var="detail" value="#{invoiceStockBean.invoiceStockDetails}" style="margin-top:10px" rendered="#{invoiceStockBean.mode != 0}">
+			
+				<f:facet name="header">
+		           #{message.taxInvoice_l_detailTable}
+		        </f:facet>
+		        
+		        <p:column headerText="#{message.taxInvoice_l_invoiceNo}">
+		            #{detail.invoiceStockNo}
+		        </p:column>
+		        
+		        <p:column headerText="#{message.taxInvoice_l_status}">
+		        	<h:outputText value="#{message.taxInvoice_l_unUsed}" rendered="#{detail.status == '0'}" />
+		        	<h:outputText value="#{message.taxInvoice_l_used}" rendered="#{detail.status == '1'}" />
+		        	<h:outputText value="#{message.taxInvoice_l_voided}" rendered="#{detail.status == '2'}" />
+		        </p:column>
+		        
+		    </p:dataTable>
+			
+			<p:toolbar style="margin-top:10px;">
+				<p:toolbarGroup align="left">
+					<p:commandButton value="#{message.resource_b_register}" icon="ui-icon-document" action="#{invoiceStockBean.registerInvoiceStock}" ajax="false" rendered="#{invoiceStockBean.mode == 0}" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="#{message.resource_b_edit}" icon="ui-icon-document" action="#{invoiceStockBean.toggleEditMode}" ajax="false" disabled="#{not invoiceStockBean.updatable}" rendered="#{invoiceStockBean.mode == 1}" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="#{message.resource_b_update}" icon="ui-icon-document" action="#{invoiceStockBean.updateInvoiceStock}" ajax="false" rendered="#{invoiceStockBean.mode == 2}" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="#{message.resource_b_del}" icon="ui-icon-document" action="#{invoiceStockBean.deleteInvoiceStock}" ajax="false" disabled="#{not invoiceStockBean.updatable}" rendered="#{invoiceStockBean.mode == 1}" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="#{message.resource_b_cancel}" icon="ui-icon-document" action="#{invoiceStockBean.backToList}" ajax="false" immediate="true" onclick="PF('statusDialog').show();" />
+				</p:toolbarGroup>
+			</p:toolbar>
+		</h:panelGroup>
+		
+	</ui:define>
+</ui:composition>

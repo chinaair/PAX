@@ -2,6 +2,10 @@ package com.chinaair.webBean;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.sql.Timestamp;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,11 +22,25 @@ import javax.inject.Named;
 
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.model.LazyDataModel;
 
+import com.chinaair.dto.TicketIssueDetailDto;
+import com.chinaair.dto.TicketIssueSearchDto;
 import com.chinaair.entity.Agent;
+import com.chinaair.entity.DailyTicketJournal;
+import com.chinaair.entity.Rate;
 import com.chinaair.entity.TicketIssue;
 import com.chinaair.entity.TicketIssueDetail;
+import com.chinaair.services.AgentServiceBean;
+import com.chinaair.services.AuthorityServiceBean;
+import com.chinaair.services.CommonServiceBean;
+import com.chinaair.services.JournalServiceBean;
+import com.chinaair.services.RateServiceBean;
 import com.chinaair.services.TicketIssueServiceBean;
+import com.chinaair.util.DateUtil;
+import com.chinaair.util.JSFUtil;
+import com.chinaair.util.JasperUtil;
+import com.chinaair.webDto.TicketIssueModel;
 
 @ConversationScoped
 @Named("ticketIssueBean")
@@ -33,11 +51,30 @@ public class TicketIssueBean implements Serializable {
 	@EJB
 	private TicketIssueServiceBean ticketIssueService;
 	
+	@EJB
+	private RateServiceBean rateService;
+	
+	@EJB
+	private CommonServiceBean commonService;
+	
+	@EJB
+	private JournalServiceBean journalService;
+	
+	@EJB
+	private AgentServiceBean agentService;
+	
+	@EJB
+	private AuthorityServiceBean authorService;
+	
 	private static final String NEW = "0";
 	
 	private static final String VIEW = "1";
 	
 	private static final String EDIT = "2";
+	
+	private static final DecimalFormat usd = new DecimalFormat("#,##0.00");
+	
+	private static final DecimalFormat vnd = new DecimalFormat("#,###");
 	
 	private Date issueDate;
 	
@@ -49,7 +86,11 @@ public class TicketIssueBean implements Serializable {
 	
 	private Agent selectedAgent;
 	
+	private Rate selectedRate;
+	
 	private String displayAgentName;
+	
+	private String inputAgentCode;
 	
 	private String inputPersonName;
 	
@@ -61,7 +102,7 @@ public class TicketIssueBean implements Serializable {
 	
 	private String modifyPersonName;
 	
-	private List<TicketIssue> ticketIssueList;
+	private LazyDataModel<TicketIssue> ticketIssueList;
 	
 	private List<TicketIssueDetail> ticketIssueDetails;
 	
@@ -74,6 +115,14 @@ public class TicketIssueBean implements Serializable {
 	private BigDecimal totalAmtUsd;
 	
 	private BigDecimal totalAmtVnd;
+	
+	private BigDecimal detailAmtUsd;
+	
+	private BigDecimal detailAmtVnd;
+	
+	private String displayTotalUsd;
+	
+	private String displayTotalVnd;
 	
 	private String inputTicketNo;
 	
@@ -91,14 +140,36 @@ public class TicketIssueBean implements Serializable {
 	
 	private String searchRefNo;
 	
+	private String searchAgentCode;
+	
 	private String searchAgentName;
 	
 	private Agent searchAgent;
 	
 	private String searchStatus;
 	
+	private String searchTicketNo;
+	
+	private String searchRoute;
+	
+	private String searchInputSD;
+	
+	private ResourceBundle bundle;
+	
+	private boolean journalClosed;
+	
+	private boolean todayRateNotSet;
+	
+	private boolean hasEditAuthority;
+	
 	@Inject
 	private Conversation conversation;
+	
+	@Inject
+	private LoginBean loginBean;
+	
+	@Inject
+	private TaxInvoiceIssueBean taxInvoiceIssueBean;
 	
 	public void startConversation() {
 		if(conversation.isTransient()) {
@@ -108,35 +179,276 @@ public class TicketIssueBean implements Serializable {
 	
 	@PostConstruct
 	public void init() {
-		ResourceBundle bundle = ResourceBundle.getBundle("com.chinaair.internationalization.AllResourceBundle");
-		bundle.getString("selectAgent_companyName");
-		ticketIssueList = ticketIssueService.findTicketIssueList();
+		bundle = ResourceBundle.getBundle("com.chinaair.internationalization.AllResourceBundle");
+		journalClosed = false;
+		resetSearchCondition();
+		searchTicketIssue(false);
 	}
 	
 	public String gotoNewTicketIssueScreen() {
-		screenMode = NEW;
-		return "TicketIssueScreen?faces-redirect=true";
-	}
-	
-	public String gotoViewTicketIssueScreen() {
-		screenMode = VIEW;
-		if(selectedTicketIssue != null) {
-			issueDate = selectedTicketIssue.getIssueDate();
-			roe = selectedTicketIssue.getRoe();
-			paymentType = selectedTicketIssue.getPaymentType();
-			selectedAgent = selectedTicketIssue.getAgent();
-			displayAgentName = selectedAgent.getName();
-			ticketIssueDetails = selectedTicketIssue.getTicketIssueDetail();
+		resetMainFields();
+		ticketIssueDetails = null;
+		todayRateNotSet = false;
+		selectedRate = rateService.getTodayRate();
+		if(selectedRate == null) {
+			todayRateNotSet = true;
+			selectedRate = rateService.getNearestRate();
+		}
+		if(selectedRate != null) {
+			roe = selectedRate.getRate();
+		}
+		issueDate = new Date();
+		totalAmtUsd = new BigDecimal(0);
+		totalAmtVnd = new BigDecimal(0);
+		displayTotalUsd = usd.format(totalAmtUsd);
+		displayTotalVnd = vnd.format(totalAmtVnd);
+		if(loginBean != null && loginBean.getLoginUser() != null) {
+			inputPersonName = loginBean.getLoginUser().getEmpName();
 		}
 		return "TicketIssueScreen?faces-redirect=true";
 	}
 	
-	public void printTicketIssueInfo() {
-		
+	public void onchangeIssueDate() {
+		selectedRate = rateService.getRateByDate(issueDate);
+		if(selectedRate != null) {
+			roe = selectedRate.getRate();
+		} else {
+			roe = null;
+		}
 	}
 	
-	public void searchTicketIssue() {
-		ticketIssueList = ticketIssueService.findTicketIssueList();
+	public LazyDataModel<TicketIssue> getTicketIssueList() {
+		return ticketIssueList;
+	}
+
+	public String gotoViewTicketIssueScreen() {
+		if(selectedTicketIssue == null) {
+			JSFUtil.addError(bundle, null, null, "resource_error_selectRecord");
+			return null;
+		}
+		screenMode = VIEW;
+		hasEditAuthority = false;
+		todayRateNotSet = false;
+		if(selectedTicketIssue != null) {
+			refNo = selectedTicketIssue.getId();
+			issueDate = selectedTicketIssue.getIssueDate();
+			if(selectedTicketIssue.getTaxInvoiceIssue() != null) {
+				taxInvoiceNo = selectedTicketIssue.getTaxInvoiceIssue().getInvoiceStockDetail().getInvoiceStockNo();
+			}
+			if(selectedTicketIssue.getRate() != null) {
+				roe = selectedTicketIssue.getRate().getRate();
+				selectedRate = selectedTicketIssue.getRate();
+			}
+			paymentType = selectedTicketIssue.getPaymentType();
+			selectedAgent = selectedTicketIssue.getAgent();
+			if(selectedAgent != null) {
+				if("1".equals(selectedAgent.getRetailFlag())) {
+					displayAgentName = selectedTicketIssue.getRetailCustomerName();
+				} else {
+					displayAgentName = selectedAgent.getName();
+				}
+				inputAgentCode = selectedAgent.getCode();
+			}
+			ticketIssueDetails = selectedTicketIssue.getTicketIssueDetail();
+			totalAmtUsd = selectedTicketIssue.getAmountUsd();
+			refreshSumMoney();
+			if(selectedTicketIssue.getInputEmp() != null) {
+				inputPersonName = selectedTicketIssue.getInputEmp().getEmpName();
+			}
+			if(selectedTicketIssue.getModifyEmp() != null) {
+				modifyPersonName = selectedTicketIssue.getModifyEmp().getEmpName();
+			}
+			modifyDatetime = selectedTicketIssue.getModifyDatetime();
+			reportDate = selectedTicketIssue.getReportedDate();
+			//edit button disabled
+			if(selectedTicketIssue.getInputEmpId().equals(loginBean.getLoginUser().getId())) {
+				hasEditAuthority = true;
+			} else if(authorService.findEmpAuthor(loginBean.getLoginUser().getId(), "0001") != null) {//edit ticket issue authority
+				hasEditAuthority = true;
+			}
+		}
+		return "TicketIssueScreen?faces-redirect=true";
+	}
+	
+	public void setTicketIssueList(LazyDataModel<TicketIssue> ticketIssueList) {
+		this.ticketIssueList = ticketIssueList;
+	}
+
+	public void editTicketIssue() {
+		screenMode = EDIT;
+	}
+	
+	public String useTicketIssue() {
+		if(!checkValidTicketIssue(true)) {
+			return null;
+		}
+		selectedTicketIssue.setIssueDate(issueDate);
+		selectedTicketIssue.setRate(selectedRate);
+		selectedTicketIssue.setPaymentType(paymentType);
+		selectedTicketIssue.setAgent(selectedAgent);
+		selectedTicketIssue.setTicketIssueDetail(ticketIssueDetails);
+		selectedTicketIssue.setStatus("0");//no tax invoice yet
+		selectedTicketIssue.setAmountUsd(totalAmtUsd);
+		selectedTicketIssue.setModifyDatetime(new Timestamp(new Date().getTime()));
+		if("1".equals(selectedAgent.getRetailFlag())) {
+			selectedTicketIssue.setRetailCustomerName(displayAgentName);
+		}
+		ticketIssueService.updateTicketIssue(selectedTicketIssue);
+		selectedTicketIssue = null;
+		//resetSearchCondition();
+		searchTicketIssue(false);
+		return "TicketIssueListScreen?faces-redirect=true";
+	}
+	
+	public String updateTicketIssue() {
+		boolean checkJournal =true;
+		if("3".equals(selectedTicketIssue.getStatus())) {//save temp
+			checkJournal = false;
+		}
+		if(!checkValidTicketIssue(checkJournal)) {
+			return null;
+		}
+		selectedTicketIssue.setIssueDate(issueDate);
+		selectedTicketIssue.setRate(selectedRate);
+		selectedTicketIssue.setPaymentType(paymentType);
+		selectedTicketIssue.setAgent(selectedAgent);
+		selectedTicketIssue.setTicketIssueDetail(ticketIssueDetails);
+		//selectedTicketIssue.setStatus("0");//no tax invoice yet
+		selectedTicketIssue.setAmountUsd(totalAmtUsd);
+		if(loginBean.getLoginUser() != null) {
+			selectedTicketIssue.setModifyEmpId(loginBean.getLoginUser().getId());
+		}
+		selectedTicketIssue.setRetailCustomerName(null);
+		if("1".equals(selectedAgent.getRetailFlag())) {
+			selectedTicketIssue.setRetailCustomerName(displayAgentName);
+		}
+		selectedTicketIssue.setModifyDatetime(new Timestamp(new Date().getTime()));
+		ticketIssueService.updateTicketIssue(selectedTicketIssue);
+		selectedTicketIssue = ticketIssueService.findTicketIssueById(selectedTicketIssue.getId());
+		return gotoViewTicketIssueScreen();
+	}
+	
+	public String voidTicketIssue() {
+		if(selectedTicketIssue != null) {
+			selectedTicketIssue.setStatus("2");
+			ticketIssueService.updateTicketIssueStatus(selectedTicketIssue);
+		}
+		selectedTicketIssue = null;
+		//resetSearchCondition();
+		searchTicketIssue(false);
+		return "TicketIssueListScreen?faces-redirect=true";
+	}
+	
+	public void printTicketIssueInfo() {
+		if(selectedTicketIssue == null) {
+			JSFUtil.addError(bundle, null, null, "resource_error_selectRecord");
+			return;
+		}
+		if("2".equals(selectedTicketIssue.getStatus())) {//voided
+			JSFUtil.addError(bundle, null, null, "resource_error_printVoidedRecord");
+			return;
+		}
+		try {
+			Map<String, Object> params = new HashMap<>();
+			params.put("systemClass", loginBean.getSystemClass());
+			params.put("type", getPaymentTypeString(selectedTicketIssue.getPaymentType()));
+			if(selectedTicketIssue.getAgent() != null) {
+				params.put("agentCode", selectedTicketIssue.getAgent().getCode());
+				if("1".equals(selectedTicketIssue.getAgent().getRetailFlag())) {
+					params.put("agentName", selectedTicketIssue.getRetailCustomerName());
+				} else {
+					params.put("agentName", selectedTicketIssue.getAgent().getName());
+				}
+			}
+			SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+			params.put("printDatetime", df.format(selectedTicketIssue.getIssueDate()));
+			params.put("refNo", selectedTicketIssue.getFormattedId());
+			if(selectedTicketIssue.getInputEmp() != null) {
+				params.put("sdName", selectedTicketIssue.getInputEmp().getEmpName());
+			}
+			if(selectedTicketIssue.getRate() != null) {
+				BigDecimal printRoe = selectedTicketIssue.getRate().getRate();
+				params.put("roe", printRoe);
+				List<TicketIssueDetailDto> detailDto = new ArrayList<>();
+				if(printRoe != null) {
+					BigDecimal thousandUnit = new BigDecimal(1000);
+					BigDecimal printTotalAmtVnd = new BigDecimal(0);
+					List<TicketIssueDetail> details = selectedTicketIssue.getTicketIssueDetail();
+					for(TicketIssueDetail detail : details) {
+						TicketIssueDetailDto dto = new TicketIssueDetailDto();
+						dto.setId(detail.getId());
+						dto.setQuantity(detail.getQuantity());
+						dto.setRoute(detail.getRoute());
+						dto.setTicketNo(detail.getTicketNo());
+						BigDecimal vndPrice = detail.getPrice().multiply(printRoe);
+						BigDecimal vndAmount = vndPrice.divide(thousandUnit).setScale(0, RoundingMode.HALF_UP).multiply(thousandUnit).multiply(new BigDecimal(detail.getQuantity()));
+						dto.setVndPrice(vndPrice);
+						dto.setVndAmount(vndAmount);
+						detailDto.add(dto);
+						printTotalAmtVnd = printTotalAmtVnd.add(vndAmount);
+					}
+					params.put("totalAmt", printTotalAmtVnd);
+					params.put("ticketIssueDetailList", detailDto);
+				}
+			}
+			ArrayList<String> dummyList = new ArrayList<>();
+			dummyList.add("dummy");
+			JasperUtil.createReportAndDownloadPDF("TicketIssue", dummyList, params);
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public void searchTicketIssue(boolean isSearchAll) {
+		TicketIssueSearchDto searchDto = new TicketIssueSearchDto();
+		if(!isSearchAll){
+			if(searchRefNo != null && searchRefNo.length() > 0) {
+				if(searchRefNo.length() != 6) {
+					JSFUtil.addError(bundle, null, ":frm:searchRefNo", "ticketIssue_error_ReferNumlength");
+					return;
+				}
+				try {
+					new Long(searchRefNo);
+				} catch(NumberFormatException e) {
+					JSFUtil.addError(bundle, null, ":frm:searchRefNo", "ticketIssue_error_searchReferNum");
+					return;
+				}
+			}
+			if(searchStartDate != null && searchEndDate != null) {
+				if(searchStartDate.compareTo(searchEndDate) > 0) {
+					JSFUtil.addError(bundle, null, ":frm:searhStart", "ticketIssue_error_searchDate");
+					return;
+				}
+			}
+			searchDto.setStartDate(searchStartDate);
+			searchDto.setEndDate(searchEndDate);
+			if(searchRefNo != null && searchRefNo.length() > 0) {
+				searchDto.setReferNumber(new Long(searchRefNo));
+			} 
+			if(searchAgent != null) {
+				searchDto.setAgentId(searchAgent.getId());
+			}
+			searchDto.setStatus(searchStatus);
+			if(searchTicketNo != null && !searchTicketNo.isEmpty()) {
+				searchDto.setTicketNo(searchTicketNo);
+			}
+			if(searchRoute != null && !searchRoute.isEmpty()) {
+				searchDto.setRoute(searchRoute);
+			}
+			if(searchInputSD != null && !searchInputSD.isEmpty()) {
+				searchDto.setInputSD(searchInputSD);
+			}
+		}else{
+			searchDto = null;
+		}
+		
+		ticketIssueList = new TicketIssueModel(ticketIssueService, searchDto);
+	}
+	
+	public void clearSearch() {
+		resetSearchCondition();
+		searchTicketIssue(false);
 	}
 	
 	public String gotoEditDetailScreen() {
@@ -145,7 +457,7 @@ public class TicketIssueBean implements Serializable {
 	}
 	
 	public void initDetail() {
-		resetFields();
+		resetDetailFields();
 		if(inputTicketDetails == null) {
 			inputTicketDetails = new ArrayList<>();
 		}
@@ -162,6 +474,10 @@ public class TicketIssueBean implements Serializable {
 				newItem.setTicketNo(item.getTicketNo());
 				inputTicketDetails.add(newItem);
 			}
+			detailAmtUsd = totalAmtUsd;
+			detailAmtVnd = totalAmtVnd;
+			displayTotalUsd = usd.format(detailAmtUsd);
+			displayTotalVnd = vnd.format(detailAmtVnd);
 		}
 	}
 	
@@ -176,50 +492,71 @@ public class TicketIssueBean implements Serializable {
 	
 	public void insertDetail() {
 		//check insert
+		if(!checkParam(false)) {
+			return;
+		}
 		TicketIssueDetail detail = new TicketIssueDetail();
 		detail.setTicketNo(inputTicketNo);
-		detail.setRoute(inputRoute);
+		detail.setRoute(inputRoute.toUpperCase());
 		detail.setQuantity(new Long(inputQuantity));
 		detail.setPrice(inputPrice);
 		detail.setAmount(inputPrice.multiply(new BigDecimal(inputQuantity)));
 		inputTicketDetails.add(detail);
-		resetFields();
+		refreshTotalAmount();
+		resetDetailFields();
 	}
 	
 	public void updateDetail() {
+		//check update
+		if(!checkParam(true)) {
+			return;
+		}
 		if(selectedTicketIssueDetail != null) {
 			selectedTicketIssueDetail.setTicketNo(inputTicketNo);
-			selectedTicketIssueDetail.setRoute(inputRoute);
+			selectedTicketIssueDetail.setRoute(inputRoute.toUpperCase());
 			selectedTicketIssueDetail.setQuantity(new Long(inputQuantity));
 			selectedTicketIssueDetail.setPrice(inputPrice);
 			selectedTicketIssueDetail.setAmount(inputPrice.multiply(new BigDecimal(inputQuantity)));
+			refreshTotalAmount();
 		}
-		resetFields();
+		resetDetailFields();
 	}
 	
 	public void deleteDetail() {
 		if(selectedTicketIssueDetail != null) {
 			inputTicketDetails.remove(selectedTicketIssueDetail);
+			refreshTotalAmount();
 			selectedTicketIssueDetail = null;
+			resetDetailFields();
+		} else {
+			JSFUtil.addError(bundle, null, null, "resource_error_selectRecord");
 		}
-		resetFields();
 	}
 	
 	public String okDetail() {
 		ticketIssueDetails = inputTicketDetails;
 		inputTicketDetails = null;
-		resetFields();
+		totalAmtUsd = detailAmtUsd;
+		totalAmtVnd = detailAmtVnd;
+		detailAmtUsd = null;
+		detailAmtVnd = null;
+		resetDetailFields();
+		inputTicketDetails = null;
 		return "TicketIssueScreen?faces-redirect=true";
 	}
 	
 	public String cancelDetail() {
 		inputTicketDetails = null;
-		resetFields();
+		detailAmtUsd = null;
+		detailAmtVnd = null;
+		displayTotalUsd = usd.format(totalAmtUsd);
+		displayTotalVnd = vnd.format(totalAmtVnd);
+		resetDetailFields();
 		return "TicketIssueScreen?faces-redirect=true";
 	}
 	
 	public void clearDetail() {
-		resetFields();
+		resetDetailFields();
 	}
 	
 	public void chooseAgent() {
@@ -231,7 +568,11 @@ public class TicketIssueBean implements Serializable {
 	public void onAgentChosen(SelectEvent event) {
 		selectedAgent = (Agent)event.getObject();
 		if(selectedAgent != null) {
-			displayAgentName = selectedAgent.getName();
+			displayAgentName = null;
+			if(!"1".equals(selectedAgent.getRetailFlag())) {
+				displayAgentName = selectedAgent.getName();
+			}
+			inputAgentCode = selectedAgent.getCode();
 		}
 	}
 	
@@ -239,29 +580,139 @@ public class TicketIssueBean implements Serializable {
 		searchAgent = (Agent)event.getObject();
 		if(searchAgent != null) {
 			searchAgentName = searchAgent.getName();
+			searchAgentCode = searchAgent.getCode();
 		}
 	}
 	
 	public String registerTicketIssue() {
+		if(!checkValidTicketIssue(true)) {
+			return null;
+		}
 		TicketIssue ticketIssue = new TicketIssue();
 		ticketIssue.setIssueDate(issueDate);
-		ticketIssue.setRoe(roe);
+		ticketIssue.setRate(selectedRate);
 		ticketIssue.setPaymentType(paymentType);
 		ticketIssue.setAgent(selectedAgent);
 		ticketIssue.setTicketIssueDetail(ticketIssueDetails);
 		ticketIssue.setStatus("0");//no tax invoice yet
+		ticketIssue.setAmountUsd(totalAmtUsd);
+		if(loginBean.getLoginUser() != null) {
+			ticketIssue.setInputEmpId(loginBean.getLoginUser().getId());
+		}
+		ticketIssue.setRetailCustomerName(null);
+		if("1".equals(selectedAgent.getRetailFlag())) {
+			ticketIssue.setRetailCustomerName(displayAgentName);
+		}
 		ticketIssueService.insertTicketIssue(ticketIssue);
+		selectedTicketIssue = ticketIssueService.findTicketIssueById(ticketIssue.getId());
+		return gotoViewTicketIssueScreen();
+	}
+	
+	public String saveTicketIssue() {
+		if(!checkValidTicketIssue(false)) {
+			return null;
+		}
+		TicketIssue ticketIssue = new TicketIssue();
+		ticketIssue.setIssueDate(issueDate);
+		ticketIssue.setRate(selectedRate);
+		ticketIssue.setPaymentType(paymentType);
+		ticketIssue.setAgent(selectedAgent);
+		ticketIssue.setTicketIssueDetail(ticketIssueDetails);
+		ticketIssue.setStatus("3");//save temp
+		ticketIssue.setAmountUsd(totalAmtUsd);
+		if(loginBean.getLoginUser() != null) {
+			ticketIssue.setInputEmpId(loginBean.getLoginUser().getId());
+		}
+		ticketIssue.setRetailCustomerName(null);
+		if("1".equals(selectedAgent.getRetailFlag())) {
+			ticketIssue.setRetailCustomerName(displayAgentName);
+		}
+		ticketIssueService.insertTicketIssue(ticketIssue);
+		selectedTicketIssue = null;
+		//resetSearchCondition();
+		searchTicketIssue(false);
 		return "TicketIssueListScreen?faces-redirect=true";
 	}
 	
-	private void resetFields() {
-		selectedTicketIssueDetail = null;
-		inputTicketNo = null;
-		inputRoute = null;
-		inputQuantity = 0;
-		inputPrice = null;
+	public String cancelRegisterTicketIssue() {
+		resetMainFields();
+		selectedTicketIssue = null;
+		ticketIssueDetails = null;
+		//resetSearchCondition();
+		searchTicketIssue(false);
+		return "TicketIssueListScreen?faces-redirect=true";
 	}
-
+	
+	public String linkTaxInvoice() {
+		if(selectedTicketIssue.getTaxInvoiceId() != null) {
+			if(taxInvoiceIssueBean != null) {
+				taxInvoiceIssueBean.setSelectedTaxInvIssue(selectedTicketIssue.getTaxInvoiceIssue());
+				taxInvoiceIssueBean.gotoViewTaxInvIssueScreen();
+				taxInvoiceIssueBean.setFromTicketIssue(true);
+			}
+			return "TaxInvoiceIssueScreen?faces-redirect=true&taxIssueId=" + selectedTicketIssue.getTaxInvoiceId();
+		}
+		if(authorService.findEmpAuthor(loginBean.getLoginUser().getId(), "0002") == null) {//edit tax invoice authority
+			JSFUtil.addError(bundle, null, null, "ticketIssue_error_noCreateTaxInvAuthor");
+			return null;
+		}
+		if(taxInvoiceIssueBean != null) {
+			taxInvoiceIssueBean.setRefNo(selectedTicketIssue.getId());
+			taxInvoiceIssueBean.loadIssueDataWithRefNo();
+			taxInvoiceIssueBean.setFromTicketIssue(true);
+		}
+		return "TaxInvoiceIssueScreen?faces-redirect=true&refNo=" + selectedTicketIssue.getId();
+	}
+	
+	public void onInputAgentCodeBlur() {
+		if(inputAgentCode == null || inputAgentCode.trim().equals("")) {
+			displayAgentName = null;
+			selectedAgent = null;
+			return;
+		}
+		selectedAgent = agentService.findAgentByCode(inputAgentCode, null, null);
+		if(selectedAgent == null) {
+			displayAgentName = null;
+			return;
+		}
+		displayAgentName = null;
+		if(!"1".equals(selectedAgent.getRetailFlag())) {
+			displayAgentName = selectedAgent.getName();
+		}
+	}
+	
+	public void onInputSearchAgentCodeBlur() {
+		if(searchAgentCode == null || searchAgentCode.trim().equals("")) {
+			searchAgentName = null;
+			searchAgent = null;
+			return;
+		}
+		searchAgent = agentService.findAgentByCode(searchAgentCode, null, null);
+		if(searchAgent == null) {
+			searchAgentName = null;
+			return;
+		}
+		searchAgentName = searchAgent.getName();
+	}
+	
+	private boolean checkParam(boolean isUpdate) {
+		boolean isValid = true;
+		//check duplicate ticket number
+		for(TicketIssueDetail detail : inputTicketDetails) {
+			if(inputTicketNo.equals(detail.getTicketNo())
+					&& (selectedTicketIssueDetail.equals(detail) && !isUpdate)) {
+				JSFUtil.addError(bundle, null, ":frm:ticketNo", "ticketIssue_error_TicketNoDuplicate");
+				isValid = false;
+				break;
+			}
+		}
+		if(inputQuantity <= 0) {
+			JSFUtil.addError(bundle, null, ":frm:quantity", "ticketIssue_error_TicketQuantity");
+			isValid = false;
+		}
+		return isValid;
+	}
+	
 	public Date getIssueDate() {
 		return issueDate;
 	}
@@ -312,6 +763,14 @@ public class TicketIssueBean implements Serializable {
 
 	public void setDisplayAgentName(String displayAgentName) {
 		this.displayAgentName = displayAgentName;
+	}
+
+	public String getInputAgentCode() {
+		return inputAgentCode;
+	}
+
+	public void setInputAgentCode(String inputAgentCode) {
+		this.inputAgentCode = inputAgentCode;
 	}
 
 	public String getInputPersonName() {
@@ -395,6 +854,38 @@ public class TicketIssueBean implements Serializable {
 		this.totalAmtVnd = totalAmtVnd;
 	}
 
+	public BigDecimal getDetailAmtUsd() {
+		return detailAmtUsd;
+	}
+
+	public void setDetailAmtUsd(BigDecimal detailAmtUsd) {
+		this.detailAmtUsd = detailAmtUsd;
+	}
+
+	public BigDecimal getDetailAmtVnd() {
+		return detailAmtVnd;
+	}
+
+	public void setDetailAmtVnd(BigDecimal detailAmtVnd) {
+		this.detailAmtVnd = detailAmtVnd;
+	}
+
+	public String getDisplayTotalUsd() {
+		return displayTotalUsd;
+	}
+
+	public void setDisplayTotalUsd(String displayTotalUsd) {
+		this.displayTotalUsd = displayTotalUsd;
+	}
+
+	public String getDisplayTotalVnd() {
+		return displayTotalVnd;
+	}
+
+	public void setDisplayTotalVnd(String displayTotalVnd) {
+		this.displayTotalVnd = displayTotalVnd;
+	}
+
 	public List<TicketIssueDetail> getInputTicketDetails() {
 		return inputTicketDetails;
 	}
@@ -433,14 +924,6 @@ public class TicketIssueBean implements Serializable {
 
 	public void setInputPrice(BigDecimal inputPrice) {
 		this.inputPrice = inputPrice;
-	}
-
-	public List<TicketIssue> getTicketIssueList() {
-		return ticketIssueList;
-	}
-
-	public void setTicketIssueList(List<TicketIssue> ticketIssueList) {
-		this.ticketIssueList = ticketIssueList;
 	}
 
 	public TicketIssue getSelectedTicketIssue() {
@@ -483,6 +966,14 @@ public class TicketIssueBean implements Serializable {
 		this.searchRefNo = searchRefNo;
 	}
 
+	public String getSearchAgentCode() {
+		return searchAgentCode;
+	}
+
+	public void setSearchAgentCode(String searchAgentCode) {
+		this.searchAgentCode = searchAgentCode;
+	}
+
 	public String getSearchAgentName() {
 		return searchAgentName;
 	}
@@ -507,12 +998,157 @@ public class TicketIssueBean implements Serializable {
 		this.searchStatus = searchStatus;
 	}
 
+	public String getSearchTicketNo() {
+		return searchTicketNo;
+	}
+
+	public void setSearchTicketNo(String searchTicketNo) {
+		this.searchTicketNo = searchTicketNo;
+	}
+
+	public String getSearchRoute() {
+		return searchRoute;
+	}
+
+	public void setSearchRoute(String searchRoute) {
+		this.searchRoute = searchRoute;
+	}
+
+	public String getSearchInputSD() {
+		return searchInputSD;
+	}
+
+	public void setSearchInputSD(String searchInputSD) {
+		this.searchInputSD = searchInputSD;
+	}
+
 	public TicketIssueServiceBean getTicketIssueService() {
 		return ticketIssueService;
 	}
 
 	public void setTicketIssueService(TicketIssueServiceBean ticketIssueService) {
 		this.ticketIssueService = ticketIssueService;
+	}
+	
+	private void resetDetailFields() {
+		selectedTicketIssueDetail = null;
+		inputTicketNo = null;
+		inputRoute = null;
+		inputQuantity = 0;
+		inputPrice = null;
+	}
+	
+	private void resetMainFields() {
+		screenMode = NEW;
+		issueDate = null;
+		roe = null;
+		paymentType = "0";
+		selectedAgent = null;
+		displayAgentName = null;
+		inputAgentCode = null;
+	}
+	
+	private boolean checkValidTicketIssue(boolean checkJournal) {
+		boolean isValid = true;
+		if(displayAgentName == null && selectedAgent == null) {
+			JSFUtil.addError(bundle, null, ":frm:agentName", "ticketIssue_error_agent");
+			JSFUtil.setInvalidComponent(":frm:agentCode");
+			isValid = false;
+		}
+		if(ticketIssueDetails == null || ticketIssueDetails.isEmpty()) {
+			JSFUtil.addError(bundle, null, null, "ticketIssue_error_inputDetail");
+			isValid = false;
+		}
+		if(isValid && checkJournal) {
+			DailyTicketJournal journal = journalService.findTicketJournalByDate(issueDate);
+			if(journal != null && "1".equals(journal.getStatus())) {//closed
+				JSFUtil.addError(bundle, null, ":frm:issueDate_input", "ticketIssue_error_journalClosed");
+				isValid = false;
+			}
+		}
+		return isValid;
+	}
+	
+	private void refreshTotalAmount() {
+		detailAmtUsd = new BigDecimal(0);
+		detailAmtVnd = new BigDecimal(0);
+		if(roe != null) {
+			BigDecimal thousandUnit = new BigDecimal(1000);
+			for(TicketIssueDetail detail : inputTicketDetails) {
+				BigDecimal quan = new BigDecimal(detail.getQuantity());
+				BigDecimal vndPrice = detail.getPrice().multiply(roe).divide(thousandUnit).setScale(0, RoundingMode.HALF_UP).multiply(thousandUnit);
+				detailAmtUsd = detailAmtUsd.add(detail.getAmount());
+				detailAmtVnd = detailAmtVnd.add(vndPrice.multiply(quan));
+			}
+			//detailAmtVnd = detailAmtUsd.multiply(roe).divide(thousandUnit).setScale(0, RoundingMode.HALF_UP).multiply(thousandUnit);
+		}
+		displayTotalUsd = usd.format(detailAmtUsd);
+		displayTotalVnd = vnd.format(detailAmtVnd);
+	}
+	
+	private String getPaymentTypeString(String paymentType) {
+		if("0".equals(paymentType)) {//Cash
+			return bundle.getString("ticketIssue_paymentType_cash");
+		} else if("1".equals(paymentType)) {//Credit card
+			return bundle.getString("ticketIssue_paymentType_credit");
+		} else if("2".equals(paymentType)) {//Bank transfer
+			return bundle.getString("ticketIssue_paymentType_transfer");
+		} else if("3".equals(paymentType)) {//Account receivable
+			return bundle.getString("ticketIssue_paymentType_account");
+		}
+		return null;
+	}
+	
+	private void resetSearchCondition() {
+		Date searchDate = new Date();
+		searchStartDate = DateUtil.getFirstDateOfMonth(searchDate);
+		searchEndDate = DateUtil.getLastDateOfMonth(searchDate);
+		searchAgent = null;
+		searchAgentCode = null;
+		searchAgentName = null;
+		searchStatus = "ALL";
+		searchTicketNo = null;
+		searchRoute = null;
+		searchInputSD = loginBean.getLoginUser().getUserId();
+		searchRefNo = null;
+	}
+	
+	private void refreshSumMoney() {
+		totalAmtVnd = new BigDecimal(0);
+		if(roe != null) {
+			BigDecimal thousandUnit = new BigDecimal(1000);
+			for(TicketIssueDetail detail : ticketIssueDetails) {
+				BigDecimal vndPrice = detail.getPrice().multiply(roe).divide(thousandUnit).setScale(0, RoundingMode.HALF_UP).multiply(thousandUnit);
+				totalAmtVnd = totalAmtVnd.add(vndPrice.multiply(new BigDecimal(detail.getQuantity())));
+			}
+			//totalAmtVnd = totalAmtUsd.multiply(roe).divide(thousandUnit).setScale(0, RoundingMode.HALF_UP).multiply(thousandUnit);
+		}
+		displayTotalUsd = usd.format(totalAmtUsd);
+		displayTotalVnd = vnd.format(totalAmtVnd);
+	}
+
+	public boolean isJournalClosed() {
+		return journalClosed;
+	}
+
+	public void setJournalClosed(boolean journalClosed) {
+		this.journalClosed = journalClosed;
+	}
+
+	public boolean isTodayRateNotSet() {
+		return todayRateNotSet;
+	}
+
+	public void setTodayRateNotSet(boolean todayRateNotSet) {
+		this.todayRateNotSet = todayRateNotSet;
+	}
+
+	public boolean isHasEditAuthority() {
+		return hasEditAuthority;
+	}
+
+	public void setHasEditAuthority(boolean hasEditAuthority) {
+		this.hasEditAuthority = hasEditAuthority;
 	}
 
 }

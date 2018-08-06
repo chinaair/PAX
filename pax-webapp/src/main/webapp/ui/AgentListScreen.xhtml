@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:pe="http://primefaces.org/ui/extensions"
+        template="pageWithMenu.xhtml">
+	<ui:define name="content">
+		<f:event type="preRenderView" listener="#{selectAgentBean.startConversation}" />
+		<h1 class="title ui-widget-header ui-corner-all"><h:outputText value="#{message.agent_header}" /></h1>
+		<h:panelGroup styleClass="entry" layout="block">
+			<p:messages id="messages" showDetail="false" autoUpdate="true" closable="false" />
+			<p:toolbar>
+				<p:toolbarGroup align="left">
+					<p:commandButton value="#{message.agent_new}" icon="ui-icon-plus" action="#{selectAgentBean.gotoNewAgentScreen}" ajax="false" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="#{message.agent_view}" icon="ui-icon-document" action="#{selectAgentBean.gotoViewAgentScreen}" ajax="false" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="#{message.agent_print}" icon="ui-icon-print" action="#{selectAgentBean.printAgentInfo}" ajax="false" />
+				</p:toolbarGroup>
+			</p:toolbar>
+			
+			<p:panel header="#{message.agent_header_search}" toggleable="true" toggleSpeed="500" closeSpeed="500" widgetVar="panel" collapsed="false" style="margin-top:10px">
+				<table border="0" cellspacing="0" cellpadding="0" width="100%">
+					<tr>
+						<td><p:outputLabel for="code" value="#{message.agent_agentCode} : " /></td>
+						<td><p:inputText value="#{selectAgentBean.searchAgentCode}" id="code" label="#{message.agent_agentCode}"/></td>
+						<td><p:outputLabel for="name" value="#{message.agent_agentName} : " /></td>
+						<td><p:inputText value="#{selectAgentBean.searchAgentName}" id="name" label="#{message.agent_agentName}"/></td>
+						<td><p:outputLabel for="vat" value="#{message.agent_vat} : " /></td>
+						<td><p:inputText value="#{selectAgentBean.searchVAT}" id="vat" label="#{message.agent_vat}"/></td>
+					</tr>
+					<tr>
+						<td><p:outputLabel for="location" value="#{message.agent_location} : " /></td>
+						<td>
+							<p:selectOneMenu id="location" value="#{selectAgentBean.searchLocationCode}">
+								<f:selectItem />
+								<f:selectItem itemLabel="#{message.agent_location_option0}" itemValue="0" />
+								<f:selectItem itemLabel="#{message.agent_location_option1}" itemValue="1" />
+							</p:selectOneMenu>
+						</td>
+						<td><p:outputLabel for="type" value="#{message.agent_type} : " /></td>
+						<td>
+							<p:selectOneMenu id="type" value="#{selectAgentBean.searchAgentType}">
+								<f:selectItem />
+								<f:selectItem itemLabel="#{message.agent_type_option0}" itemValue="0" />
+								<f:selectItem itemLabel="#{message.agent_type_option1}" itemValue="1" />
+							</p:selectOneMenu>
+						</td>
+						<td colspan="2">
+							<p:commandButton value="#{message.agent_bt_search}" icon="ui-icon-document" actionListener="#{selectAgentBean.searchAgent}" ajax="false" onclick="PF('statusDialog').show();" />
+						</td>
+					</tr>
+				</table>
+			</p:panel>
+			<p:dataTable value="#{selectAgentBean.agentList}" var="agent" style="margin-top:10px"
+		 		rowKey="#{agent.id}"
+				paginator="true" rows="10" selection="#{selectAgentBean.selectedAgent}" selectionMode="single">
+				
+				 <p:ajax event="rowSelect" listener="#{selectAgentBean.onRowSelectAgent}"/>  
+       			
+				<f:facet name="header">
+		           #{message.agent_list_header}
+		        </f:facet>
+		        <p:column headerText="#{message.agent_agentCode}" filterBy="code" filterMatchMode="contains">
+		           <h:outputText value="#{agent.code}"> </h:outputText>
+		        </p:column>
+		  
+		        <p:column headerText="#{message.agent_agentName}" filterBy="name" filterMatchMode="contains">
+		             <h:outputText value="#{agent.name}" ></h:outputText>
+		        </p:column>
+		        
+		         <p:column headerText="#{message.agent_vat}" filterBy="vat_code" filterMatchMode="contains">
+		             <h:outputText value="#{agent.vat_code}" ></h:outputText>
+		        </p:column>
+		        
+		        <p:column headerText="#{message.agent_location}" filterBy="location" filterMatchMode="exact" filterOptions="#{selectAgentBean.locationOptions}">
+		            <h:outputText value="#{message.agent_location_option0}" rendered="#{agent.location=='0'}" />
+				    <h:outputText value="#{message.agent_location_option1}"  rendered="#{agent.location=='1'}" />
+		        </p:column>
+		        
+		        <p:column headerText="#{message.agent_type}" filterBy="type" filterMatchMode="exact" filterOptions="#{selectAgentBean.typeOptions}">
+		            <h:outputText value="#{message.agent_type_option0}" rendered="#{agent.type == '0' }" />
+				    <h:outputText value="#{message.agent_type_option1}" rendered="#{agent.type == '1' }" />
+		        </p:column>
+		        
+	    	</p:dataTable>
+			
+			<p:toolbar style="margin-top:10px;">
+				<p:toolbarGroup align="left">
+					<p:commandButton value="#{message.agent_new}" icon="ui-icon-plus" action="#{selectAgentBean.gotoNewAgentScreen}" ajax="false" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="#{message.agent_view}" icon="ui-icon-document" action="#{selectAgentBean.gotoViewAgentScreen}" ajax="false" onclick="PF('statusDialog').show();" />
+					<p:commandButton value="#{message.agent_print}" icon="ui-icon-print" action="#{selectAgentBean.printAgentInfo}" ajax="false" />
+				</p:toolbarGroup>
+			</p:toolbar>
+		</h:panelGroup>
+			
+	</ui:define>
+</ui:composition>

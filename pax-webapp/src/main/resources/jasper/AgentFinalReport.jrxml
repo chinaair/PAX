@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="TicketIssue" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="cd4613dc-fcbe-47c7-b747-b5379a3c7873">
+	<property name="ireport.zoom" value="1.1000000000000008"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.background.image.properties" value="false,true,0.25,0,0,0,0,0,0"/>
+	<parameter name="printDate" class="java.lang.String"/>
+	<parameter name="address" class="java.lang.String"/>
+	<parameter name="tel" class="java.lang.String"/>
+	<parameter name="fax" class="java.lang.String"/>
+	<parameter name="startDate" class="java.lang.String"/>
+	<parameter name="endDate" class="java.lang.String"/>
+	<parameter name="accManagerName" class="java.lang.String"/>
+	<parameter name="systemClass" class="java.lang.String"/>
+	<field name="agent.company" class="java.lang.String"/>
+	<field name="agent.address" class="java.lang.String"/>
+	<field name="agent.phone" class="java.lang.String"/>
+	<field name="agent.fax" class="java.lang.String"/>
+	<field name="summaryAmtUsd" class="java.math.BigDecimal"/>
+	<field name="summaryAmtVnd" class="java.math.BigDecimal"/>
+	<field name="invoiceSummary" class="java.util.List"/>
+	<pageHeader>
+		<band height="73" splitType="Stretch">
+			<textField pattern="">
+				<reportElement x="405" y="0" width="150" height="20" uuid="2718223e-e4fa-45a8-8562-7f695919131d"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Date: "+$P{printDate}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="0" y="0" width="294" height="43" uuid="c95ccb37-b3ec-412f-977a-3381b57ecc0c"/>
+				<imageExpression><![CDATA["AE".equals($P{systemClass})?"../../images/banner_ae_long.png":"../../images/banner.png"]]></imageExpression>
+			</image>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="43" width="204" height="10" uuid="4711eb67-2478-4e84-b07f-970415b6da99"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{address}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="53" width="22" height="10" uuid="e3c9357c-d150-4a38-9c84-7b98b5f78c1c"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Tel:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="22" y="53" width="80" height="10" uuid="e2c02333-1453-47ef-a6ba-9134609c7714"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{tel}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="102" y="53" width="22" height="10" uuid="90dc6d76-240e-485e-b5eb-bbbc819807f6"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Fax:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="124" y="53" width="80" height="10" uuid="7de718ac-35d7-4ff9-82c0-7d078c394edc"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{fax}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="281" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="120" width="555" height="20" uuid="7f46952c-56b9-42d6-908e-989bf916b185"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{invoiceSummary})]]></dataSourceExpression>
+				<subreportExpression><![CDATA["AgentFinalReportDetails.jasper"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement x="0" y="0" width="22" height="20" uuid="58557508-7d88-4103-a8d6-c8e49333a23d"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<text><![CDATA[To:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="22" y="0" width="533" height="20" uuid="56853073-dffb-4c07-9d2f-955cac7b828c"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{agent.company}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="22" y="20" width="533" height="20" uuid="8da92c61-56e4-4320-9c0b-8952ea879ade"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{agent.address}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="22" y="40" width="24" height="20" uuid="940b2098-f49d-4553-a10b-3b4484c2a146"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<text><![CDATA[Tel:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="46" y="40" width="180" height="20" uuid="5d00bdfb-cf37-4662-a63d-cb2d3326ed24"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{agent.phone}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="226" y="40" width="26" height="20" uuid="2ef2af2c-e105-499b-9fbd-ffd3286c8596"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<text><![CDATA[Fax:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="252" y="40" width="100" height="20" uuid="77773be3-b8b3-461b-adda-f65cc563c46d"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{agent.fax}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="0" y="70" width="555" height="50" uuid="15439941-6756-4e83-ad5c-ae0915c167fd"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Please be informed that the total amount of the invoice from " + $P{startDate} + " to " + $P{endDate} + " as below:"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement positionType="Float" x="0" y="140" width="195" height="20" uuid="9f98c5c8-fd31-4089-af61-a8d071521f3d"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<bottomPen lineWidth="4.0" lineStyle="Double"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<text><![CDATA[Total Amount]]></text>
+			</staticText>
+			<textField pattern="#,##0.00" isBlankWhenNull="false">
+				<reportElement positionType="Float" x="195" y="140" width="180" height="20" uuid="4142132e-0fc4-493d-a6af-43a2247c8e1d"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<bottomPen lineWidth="4.0" lineStyle="Double"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{summaryAmtUsd}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="false">
+				<reportElement positionType="Float" x="375" y="140" width="180" height="20" uuid="19bf3693-ee0f-466c-8b67-378583215855"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<bottomPen lineWidth="4.0" lineStyle="Double"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{summaryAmtVnd}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement positionType="Float" x="435" y="220" width="120" height="20" uuid="a3fd3222-7518-49d2-8492-f85298c858d8"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<text><![CDATA[Accounting Manager]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="435" y="240" width="120" height="20" uuid="d3a02e18-e59b-4130-a22a-dcf617148a28"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<text><![CDATA[Vietnam Branch Office]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="435" y="260" width="120" height="20" uuid="53f5ab15-a67a-4735-90a5-8b225027353d"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<text><![CDATA[China Airlines]]></text>
+			</staticText>
+			<break>
+				<reportElement positionType="Float" x="0" y="280" width="555" height="1" uuid="9b685ae5-d96a-476c-b799-26d7fc47167b"/>
+			</break>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" x="435" y="200" width="120" height="20" uuid="c5643591-0545-488b-800a-cc42619db36e"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{accManagerName}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
