@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<web-app version="3.1">
+<web-app version="3.2">
 	<display-name>Archetype Created Web Application</display-name>
 	<welcome-file-list>
 		<welcome-file>faces/home.xhtml</welcome-file>
